@@ -5,7 +5,7 @@ plugins {
     alias(versions.plugins.compose)
 }
 
-group = "pathfinding"
+group = "pl.pathfinding"
 version = "1.0-SNAPSHOT"
 
 dependencies {

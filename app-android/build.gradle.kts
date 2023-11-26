@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "pathfinding"
+    namespace = "pl.pathfinding"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "pathfinding"
+        applicationId = "pl.pathfinding"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

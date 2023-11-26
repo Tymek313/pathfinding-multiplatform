@@ -17,9 +17,11 @@ kotlin {
     }
 }
 
+task("testClasses")
+
 android {
     compileSdk = 34
-    namespace = "pathfinding.shared"
+    namespace = "pl.pathfinding.shared"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
