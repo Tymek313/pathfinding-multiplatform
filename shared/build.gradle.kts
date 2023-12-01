@@ -1,11 +1,9 @@
 plugins {
     alias(versions.plugins.compose)
     alias(versions.plugins.kotlin.multiplatform)
-    alias(versions.plugins.agp)
 }
 
 kotlin {
-    androidTarget()
     jvm()
 
     sourceSets {
@@ -14,26 +12,10 @@ kotlin {
                 implementation(compose.desktop.common)
             }
         }
-    }
-}
-
-task("testClasses")
-
-android {
-    compileSdk = 34
-    namespace = "pl.pathfinding.shared"
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
-
-    defaultConfig {
-        minSdk = 24
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlin {
-        jvmToolchain(versions.versions.java.get().toInt())
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
     }
 }

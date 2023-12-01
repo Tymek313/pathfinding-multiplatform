@@ -1,4 +1,4 @@
-package ui.components
+package ui.components.board
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
@@ -25,13 +25,13 @@ fun Board(state: BoardState) {
                 onDrag = { change, _ -> state.onDrag(pointerPosition = change.position) }
             )
         }.pointerInput(Unit) {
-            detectTapGestures { state.onFieldClick(pointerPosition = it) }
+            detectTapGestures { state.onNodeClick(pointerPosition = it) }
         }
     ) {
         (0..<state.sizeY).forEach { y ->
             Row {
                 (0..<state.sizeX).forEach { x ->
-                    Box(modifier = Modifier.size(state.fieldSizeDp).background(state.getFieldStateAtPosition(x, y).color).border(1.dp, Color.Black))
+                    Box(modifier = Modifier.size(state.nodeDisplaySizeDp).background(state.getNodeStateAtPosition(x, y).color).border(1.dp, Color.Black))
                 }
             }
         }
@@ -49,8 +49,6 @@ fun Board(state: BoardState) {
 private fun BoardPreview() {
     Board(
         BoardState(
-            startPosition = BoardState.Position(x = 0, y = 0),
-            endPosition = BoardState.Position(x = 19, y = 19),
             sizeX = 20,
             sizeY = 20
         )
