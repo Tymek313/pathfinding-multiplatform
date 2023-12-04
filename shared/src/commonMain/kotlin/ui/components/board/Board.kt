@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -22,15 +23,19 @@ fun Board(state: BoardState) {
             detectDragGestures(
                 onDragStart = { state.onDragStart(pointerPosition = it) },
                 onDragEnd = { state.onDragEnd() },
-                onDrag = { change, _ -> state.onDrag(pointerPosition = change.position) }
+                onDrag = { change, _ ->
+                    if (state.onDrag(pointerPosition = change.position)) {
+                        change.consume()
+                    }
+                }
             )
         }.pointerInput(Unit) {
             detectTapGestures { state.onNodeClick(pointerPosition = it) }
         }
     ) {
-        (0..<state.sizeY).forEach { y ->
+        (0..<state.nodeCountY).forEach { y ->
             Row {
-                (0..<state.sizeX).forEach { x ->
+                (0..<state.nodeCountX).forEach { x ->
                     Box(modifier = Modifier.size(state.nodeDisplaySizeDp).background(state.getNodeStateAtPosition(x, y).color).border(1.dp, Color.Black))
                 }
             }
@@ -50,7 +55,8 @@ private fun BoardPreview() {
     Board(
         BoardState(
             sizeX = 20,
-            sizeY = 20
+            sizeY = 20,
+            density = LocalDensity.current
         )
     )
 }
