@@ -1,4 +1,4 @@
-package ui.components.board
+package ui.component.board
 
 import androidx.compose.ui.graphics.Color
 
