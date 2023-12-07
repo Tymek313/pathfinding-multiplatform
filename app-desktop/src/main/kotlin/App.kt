@@ -1,41 +1,41 @@
-package com.example.appdesktop
+package pl.pathfinding
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.darkColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.WindowState
-import androidx.compose.ui.window.singleWindowApplication
-import kotlinx.coroutines.launch
-import ui.components.board.Board
-import ui.components.board.rememberBoardState
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
+import ui.resource.StringRes
+import ui.screen.BoardScreen
+import ui.theme.PathfindingBackground
+import ui.theme.PathfindingTheme
 
-fun main() = singleWindowApplication(
-    title = "Pathfinding",
-    state = WindowState(width = 1200.dp, height = 900.dp, position = WindowPosition.Aligned(Alignment.Center))
-) {
-    App()
+fun main() = application {
+    Window(
+        onCloseRequest = ::exitApplication,
+        state = rememberWindowState(width = 1200.dp, height = 900.dp, position = WindowPosition.Aligned(Alignment.Center)),
+        title = StringRes.graphPathfinding
+    ) {
+        App()
+    }
 }
 
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 private fun App() {
-    val scope = rememberCoroutineScope()
-    val boardState = rememberBoardState(sizeX = 20, sizeY = 20)
-
-    MaterialTheme(colors = darkColors()) {
-        Row(modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background)) {
-            Board(boardState)
-            Button(onClick = { scope.launch { boardState.startSearch() } }) {
-                Text("Start search")
+    PathfindingTheme {
+        PathfindingBackground {
+            Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                BoardScreen(calculateWindowSizeClass())
             }
         }
     }

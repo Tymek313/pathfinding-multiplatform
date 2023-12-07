@@ -1,6 +1,6 @@
-package ui.pathfinder
+package pathfinder
 
-import ui.components.board.NodeState
+import ui.component.board.NodeState
 
 object PathfinderFactory {
 
@@ -10,5 +10,3 @@ object PathfinderFactory {
         }
     }
 }
-
-enum class PathfinderType { BREADTH_FIRST }

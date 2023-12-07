@@ -10,6 +10,7 @@ version = "1.0-SNAPSHOT"
 
 dependencies {
     implementation(project(":shared"))
+    implementation(compose.material3)
     implementation(compose.desktop.currentOs)
 }
 

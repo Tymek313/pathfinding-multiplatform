@@ -1,7 +1,7 @@
-package ui.pathfinder
+package pathfinder
 
-import ui.components.board.NodeState
-import ui.pathfinder.Pathfinder.Progress
+import pathfinder.Pathfinder.Progress
+import ui.component.board.NodeState
 
 class BreadthFirstPathfinder(nodes: List<NodeState>, private val rowSize: Int) : Pathfinder {
     private val nodes = nodes.toMutableList()
