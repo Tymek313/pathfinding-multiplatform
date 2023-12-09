@@ -13,6 +13,6 @@ internal val DesktopWindowSizeClass = WindowSizeClass.calculateFromSize(
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 internal val PhoneWindowSizeClass = WindowSizeClass.calculateFromSize(
-    Size(width = 800f, height = 800f),
+    Size(width = 500f, height = 800f),
     Density(density = 1f, fontScale = 1f)
 )

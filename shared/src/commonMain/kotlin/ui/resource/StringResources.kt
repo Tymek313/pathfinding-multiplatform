@@ -8,6 +8,7 @@ interface StringResources {
     val removeObstacles: String
     val restoreBoard: String
     val breadthFirst: String
+    val pathfindingAlgorithm: String
 }
 
 internal object EnglishStringResources : StringResources {
@@ -16,6 +17,7 @@ internal object EnglishStringResources : StringResources {
     override val removeObstacles = "Remove obstacles"
     override val restoreBoard = "Restore board"
     override val breadthFirst = "Breadth first search"
+    override val pathfindingAlgorithm = "Pathfinding algorithm"
 }
 
 internal object PolishStringResources : StringResources {
@@ -24,6 +26,7 @@ internal object PolishStringResources : StringResources {
     override val removeObstacles = "Usuń przeszkody"
     override val restoreBoard = "Przywróć planszę"
     override val breadthFirst = "Przeszukiwanie w szerz"
+    override val pathfindingAlgorithm = "Algorytm przeszukiwania"
 }
 
 internal expect val currentLanguage: String

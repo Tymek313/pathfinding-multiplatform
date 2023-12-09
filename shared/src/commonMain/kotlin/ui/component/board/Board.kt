@@ -15,12 +15,17 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Board(state: BoardState) {
-    Column(Modifier.boardPointerInput(state)) {
+fun Board(state: BoardState, modifier: Modifier = Modifier) {
+    Column(modifier.boardPointerInput(state)) {
         (0..<state.nodeCountY).forEach { y ->
             Row {
                 (0..<state.nodeCountX).forEach { x ->
-                    Box(modifier = Modifier.size(state.nodeDisplaySizeDp).background(state.getNodeStateAtPosition(x, y).color).border(1.dp, Color.Black))
+                    Box(
+                        Modifier
+                            .size(state.nodeDisplaySizeDp)
+                            .background(state.getNodeStateAtPosition(x, y).color)
+                            .border(1.dp, Color.Black)
+                    )
                 }
             }
         }
