@@ -13,8 +13,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -36,15 +35,12 @@ class BoardState private constructor(
     val nodeCountX: Int,
     val nodeCountY: Int,
     private val scope: CoroutineScope,
-    density: Density,
+    private val density: Density,
     savedNodes: List<NodeState>?
 ) {
 
     constructor(sizeX: Int, sizeY: Int, density: Density, scope: CoroutineScope) : this(sizeX, sizeY, scope, density, null)
 
-    val nodeDisplaySizeDp = 20.dp
-    private val nodeDisplaySize = density.run { nodeDisplaySizeDp.roundToPx() }
-    private val boardSize = IntSize(nodeCountX * nodeDisplaySize, nodeCountY * nodeDisplaySize)
     private var draggedNode: NodeState? = null
     private val isDraggingNode get() = draggedNode != null
     private var toggleToNodeState: NodeState? = null
@@ -79,18 +75,18 @@ class BoardState private constructor(
         }
     }
 
-    fun onNodeClick(pointerPosition: Offset) {
+    fun onNodeClick(nodeSize: Dp, pointerPosition: Offset) {
         if (isInteractionLocked) return
 
-        getNodeIndexFor(pointerPosition)?.let { nodeIndex ->
+        getNodeIndexFor(nodeSize, pointerPosition)?.let { nodeIndex ->
             toggleNode(nodeIndex)
         }
     }
 
-    fun onDragStart(pointerPosition: Offset) {
+    fun onDragStart(nodeSize: Dp, pointerPosition: Offset) {
         if (isInteractionLocked) return
 
-        getNodeIndexFor(pointerPosition)?.let { nodeIndex ->
+        getNodeIndexFor(nodeSize, pointerPosition)?.let { nodeIndex ->
             val node = nodes[nodeIndex]
             if (node.isDraggable) {
                 draggedNode = node
@@ -101,10 +97,10 @@ class BoardState private constructor(
         }
     }
 
-    fun onDrag(pointerPosition: Offset): Boolean {
+    fun onDrag(nodeSize: Dp, pointerPosition: Offset): Boolean {
         if (isInteractionLocked) return false
 
-        return getNodeIndexFor(pointerPosition)?.let { nodeIndex ->
+        return getNodeIndexFor(nodeSize, pointerPosition)?.let { nodeIndex ->
             onNodeDrag(nodeIndex)
             true
         } ?: false
@@ -186,9 +182,13 @@ class BoardState private constructor(
         nodes.addAll(newNodes)
     }
 
-    private fun getNodeIndexFor(pointerPosition: Offset): NodeIndex? {
-        return if (pointerPosition.x < boardSize.width && pointerPosition.y < boardSize.height) {
-            NodeIndex((pointerPosition.y.toInt() / nodeDisplaySize * nodeCountX) + (pointerPosition.x.toInt() / nodeDisplaySize))
+    private fun getNodeIndexFor(nodeSize: Dp, pointerPosition: Offset): NodeIndex? {
+        val nodeSizePx = density.run { nodeSize.toPx() }
+        val boardWidth = nodeCountX * nodeSizePx
+        val boardHeight = nodeCountY * nodeSizePx
+
+        return if (pointerPosition.x < boardWidth && pointerPosition.y < boardHeight) {
+            NodeIndex(((pointerPosition.y / nodeSizePx).toInt() * nodeCountX) + (pointerPosition.x / nodeSizePx).toInt())
         } else {
             null
         }
