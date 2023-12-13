@@ -1,6 +1,7 @@
 package ui.component.board
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -28,7 +29,7 @@ import pathfinder.PathfinderType
 fun rememberBoardState(sizeX: Int, sizeY: Int): BoardState {
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
-    return rememberSaveable(sizeX, sizeY, density, scope, saver = BoardState.Saver(density, scope)) { BoardState(sizeX, sizeY, density, scope) }
+    return rememberSaveable(sizeX, sizeY, density, scope, saver = BoardState.Saver(density, scope)) { BoardState(sizeX, sizeY, scope, density) }
 }
 
 class BoardState private constructor(
@@ -39,8 +40,6 @@ class BoardState private constructor(
     savedNodes: List<NodeState>?
 ) {
 
-    constructor(sizeX: Int, sizeY: Int, density: Density, scope: CoroutineScope) : this(sizeX, sizeY, scope, density, null)
-
     private var draggedNode: NodeState? = null
     private val isDraggingNode get() = draggedNode != null
     private var toggleToNodeState: NodeState? = null
@@ -48,13 +47,15 @@ class BoardState private constructor(
     private val nodes = mutableStateListOf<NodeState>()
     private var savedNodes = mutableListOf<NodeState>()
     var pathfinderType by mutableStateOf(PathfinderType.BREADTH_FIRST)
-    var isInteractionLocked by mutableStateOf(false)
-        private set
-    var isSearchFinished by mutableStateOf(false)
+    private var controlState by mutableStateOf(ControlState.IDLE)
+    val isBoardIdle by derivedStateOf { controlState == ControlState.IDLE }
+    val isBoardSearchFinished by derivedStateOf { controlState == ControlState.SEARCH_FINISHED }
 
     init {
         fillNodes(savedNodes)
     }
+
+    constructor(nodeCountX: Int, nodeCountY: Int, scope: CoroutineScope, density: Density) : this(nodeCountX, nodeCountY, scope, density, null)
 
     private fun fillNodes(savedNodes: List<NodeState>?) {
         nodes.addAll(
@@ -76,7 +77,7 @@ class BoardState private constructor(
     }
 
     fun onNodeClick(nodeSize: Dp, pointerPosition: Offset) {
-        if (isInteractionLocked) return
+        if (controlState != ControlState.IDLE) return
 
         getNodeIndexFor(nodeSize, pointerPosition)?.let { nodeIndex ->
             toggleNode(nodeIndex)
@@ -84,7 +85,7 @@ class BoardState private constructor(
     }
 
     fun onDragStart(nodeSize: Dp, pointerPosition: Offset) {
-        if (isInteractionLocked) return
+        if (controlState != ControlState.IDLE) return
 
         getNodeIndexFor(nodeSize, pointerPosition)?.let { nodeIndex ->
             val node = nodes[nodeIndex]
@@ -98,7 +99,7 @@ class BoardState private constructor(
     }
 
     fun onDrag(nodeSize: Dp, pointerPosition: Offset): Boolean {
-        if (isInteractionLocked) return false
+        if (controlState != ControlState.IDLE) return false
 
         return getNodeIndexFor(nodeSize, pointerPosition)?.let { nodeIndex ->
             onNodeDrag(nodeIndex)
@@ -141,10 +142,10 @@ class BoardState private constructor(
 
     @OptIn(ObsoleteCoroutinesApi::class)
     fun startSearch() {
-        check(!isInteractionLocked)
+        check(controlState == ControlState.IDLE) { "Control state is not idle: $controlState" }
 
         savedNodes = nodes.toMutableList()
-        isInteractionLocked = true
+        controlState = ControlState.SEARCHING
         val pathfinder = PathfinderFactory.create(pathfinderType, nodes, nodeCountX)
         ticker(ANIMATION_DELAY_MILLIS).also { ticker ->
             scope.launch {
@@ -156,7 +157,7 @@ class BoardState private constructor(
     private fun advanceAnimation(ticker: ReceiveChannel<Unit>, pathfinder: Pathfinder) {
         val progress = pathfinder.stepForward()
         if (progress.searchFinished) {
-            isSearchFinished = true
+            controlState = ControlState.SEARCH_FINISHED
             ticker.cancel()
         }
         replaceNodes(progress.nodes)
@@ -173,8 +174,8 @@ class BoardState private constructor(
 
     fun restoreBoard() {
         replaceNodes(savedNodes)
-        isSearchFinished = false
-        isInteractionLocked = false
+        savedNodes.clear()
+        controlState = ControlState.IDLE
     }
 
     private fun replaceNodes(newNodes: List<NodeState>) {
@@ -211,20 +212,48 @@ class BoardState private constructor(
     @JvmInline
     private value class NodeIndex(val index: Int)
 
+    enum class ControlState {
+        IDLE, SEARCHING, SEARCH_FINISHED
+    }
+
     companion object {
         private const val ANIMATION_DELAY_MILLIS = 5L
 
         @Suppress("UNCHECKED_CAST")
         fun Saver(density: Density, scope: CoroutineScope): Saver<BoardState, Any> {
-            val keySizeX = "sizeX"
-            val keySizeY = "sizeY"
+            val keyNodeCountX = "nodeCountX"
+            val keyNodeCountY = "nodeCountY"
             val keyNodes = "nodes"
+            val keyControlState = "controlState"
+            val keySavedNodes = "savedNodes"
+            val keyPathfinderType = "pathfinderType"
 
             return mapSaver(
                 save = { boardState ->
-                    mapOf(keySizeX to boardState.nodeCountX, keySizeY to boardState.nodeCountY, keyNodes to boardState.nodes.toMutableList())
+                    mapOf(
+                        keyNodeCountX to boardState.nodeCountX,
+                        keyNodeCountY to boardState.nodeCountY,
+                        keyNodes to boardState.nodes.toMutableList(),
+                        keyControlState to boardState.controlState,
+                        keySavedNodes to boardState.savedNodes,
+                        keyPathfinderType to boardState.pathfinderType
+                    )
                 },
-                restore = { BoardState(it[keySizeX] as Int, it[keySizeY] as Int, scope, density, it[keyNodes] as List<NodeState>) }
+                restore = {
+                    val controlState = it[keyControlState] as ControlState
+                    val savedNodes = it[keySavedNodes] as List<NodeState>
+                    val nodes = it[keyNodes] as List<NodeState>
+                    // TODO: Restore the pathfinder and continue animation after state restoration
+                    val wasSearchingOnStateSave = controlState == ControlState.SEARCHING
+                    val nodesToRestore = if (wasSearchingOnStateSave) savedNodes else nodes
+                    val newControlState = if (wasSearchingOnStateSave) ControlState.IDLE else controlState
+
+                    BoardState(it[keyNodeCountX] as Int, it[keyNodeCountY] as Int, scope, density, nodesToRestore).also { boardState ->
+                        boardState.controlState = newControlState
+                        boardState.pathfinderType = it[keyPathfinderType] as PathfinderType
+                        boardState.savedNodes.addAll(savedNodes)
+                    }
+                }
             )
         }
     }

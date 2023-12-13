@@ -64,26 +64,26 @@ private fun WideBoardScreen(boardState: BoardState) {
                 ControlButton(
                     modifier = controlButtonModifier,
                     text = StringRes.startSearch,
-                    isEnabled = !boardState.isInteractionLocked,
+                    isEnabled = boardState.isBoardIdle,
                     onClick = boardState::startSearch
                 )
                 OutlinedControlButton(
                     modifier = controlButtonModifier,
                     text = StringRes.removeObstacles,
-                    isEnabled = !boardState.isInteractionLocked,
+                    isEnabled = boardState.isBoardIdle,
                     onClick = boardState::removeObstacles
                 )
                 OutlinedControlButton(
                     modifier = controlButtonModifier,
                     text = StringRes.restoreBoard,
-                    isEnabled = boardState.isSearchFinished,
+                    isEnabled = boardState.isBoardSearchFinished,
                     onClick = boardState::restoreBoard
                 )
 
                 Divider(modifier = Modifier.padding(vertical = 8.dp))
 
                 PathfinderTypeDropdown(
-                    isEnabled = !boardState.isInteractionLocked,
+                    isEnabled = boardState.isBoardIdle,
                     selectedPathfinderType = boardState.pathfinderType,
                     onPathfinderTypeChange = boardState::pathfinderType::set
                 )
@@ -102,7 +102,7 @@ private fun NarrowBoardScreen(boardState: BoardState) {
             Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 PathfinderTypeDropdown(
                     modifier = Modifier.fillMaxWidth(),
-                    isEnabled = !boardState.isInteractionLocked,
+                    isEnabled = boardState.isBoardIdle,
                     selectedPathfinderType = boardState.pathfinderType,
                     onPathfinderTypeChange = boardState::pathfinderType::set
                 )
@@ -110,20 +110,20 @@ private fun NarrowBoardScreen(boardState: BoardState) {
                     OutlinedControlButton(
                         modifier = Modifier.weight(1f),
                         text = StringRes.removeObstacles,
-                        isEnabled = !boardState.isInteractionLocked,
+                        isEnabled = boardState.isBoardIdle,
                         onClick = boardState::removeObstacles
                     )
                     OutlinedControlButton(
                         modifier = Modifier.weight(1f),
                         text = StringRes.restoreBoard,
-                        isEnabled = boardState.isSearchFinished,
+                        isEnabled = boardState.isBoardSearchFinished,
                         onClick = boardState::restoreBoard
                     )
                 }
                 ControlButton(
                     modifier = Modifier.fillMaxWidth(),
                     text = StringRes.startSearch,
-                    isEnabled = !boardState.isInteractionLocked,
+                    isEnabled = boardState.isBoardIdle,
                     onClick = boardState::startSearch
                 )
             }
