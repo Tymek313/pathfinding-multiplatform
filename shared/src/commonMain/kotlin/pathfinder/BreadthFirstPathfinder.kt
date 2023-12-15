@@ -1,22 +1,21 @@
 package pathfinder
 
-import pathfinder.Pathfinder.Progress
+import pathfinder.Board.NodeIndex
 import ui.component.board.NodeState
 
-class BreadthFirstPathfinder(nodes: List<NodeState>, private val rowSize: Int) : Pathfinder {
-    private val nodes = nodes.toMutableList()
-    private val nodeCount get() = nodes.size
+class BreadthFirstPathfinder(board: Board) : Pathfinder {
+
+    private val board = board.copy()
     private val queuedNodes = ArrayDeque<VisitedNode>().apply(::initializeQueue)
+    override var searchFinished = false
 
     private fun initializeQueue(queue: ArrayDeque<VisitedNode>) {
-        val startField = nodes.indexOf(NodeState.START)
-        check(startField != -1)
-        queue.addFirst(VisitedNode(index = startField, nodeState = QueuedNode.START, cameFrom = null))
+        queue.addFirst(VisitedNode(index = board.startNodeIndex, nodeState = QueuedNode.START, cameFrom = null))
     }
 
-    override fun stepForward(): Progress {
-        val searchEnded = searchNode(queuedNodes.removeFirst())
-        return Progress(nodes.toMutableList(), searchEnded)
+    override fun stepForward(): Board {
+        searchFinished = searchNode(queuedNodes.removeFirst())
+        return board.copy()
     }
 
     private fun searchNode(node: VisitedNode): Boolean {
@@ -33,8 +32,7 @@ class BreadthFirstPathfinder(nodes: List<NodeState>, private val rowSize: Int) :
     }
 
     private fun handleQueuedNode(node: VisitedNode): Boolean {
-        val nodeIndex = node.index
-        nodes[nodeIndex] = NodeState.VISITED
+        board[node.index] = NodeState.VISITED
         addNeighborsToQueue(node)
         return queuedNodes.isEmpty()
     }
@@ -45,25 +43,17 @@ class BreadthFirstPathfinder(nodes: List<NodeState>, private val rowSize: Int) :
     }
 
     private fun addNeighborsToQueue(node: VisitedNode) {
-        val nodeIndex = node.index
-        val isFirstFieldInRow = nodeIndex % rowSize == 0
-        val isLastFieldInRow = nodeIndex % rowSize == rowSize - 1
-        val leftNeighbor = if (isFirstFieldInRow) null else nodeIndex - 1
-        val rightNeighbor = if (isLastFieldInRow) null else nodeIndex + 1
-        val topNeighbor = (nodeIndex - rowSize).takeIf { it >= 0 }
-        val bottomNeighbor = (nodeIndex + rowSize).takeIf { it < nodeCount }
-
-        listOfNotNull(leftNeighbor, rightNeighbor, topNeighbor, bottomNeighbor).forEach { neighborIndex ->
+        board.getNeighborsFor(node.index).forEach { neighborIndex ->
             addNeighborToQueue(node, neighborIndex)
         }
     }
 
-    private fun addNeighborToQueue(node: VisitedNode, neighborIndex: Int) {
-        val neighborField = nodes[neighborIndex]
+    private fun addNeighborToQueue(node: VisitedNode, neighborIndex: NodeIndex) {
+        val neighborField = board[neighborIndex]
         if (neighborField.isQueueable) {
             queuedNodes.addLast(VisitedNode(index = neighborIndex, nodeState = QueuedNode.from(neighborField), cameFrom = node))
             if (neighborField.isToggleable) {
-                nodes[neighborIndex] = NodeState.QUEUED
+                board[neighborIndex] = NodeState.QUEUED
             }
         }
     }
@@ -71,12 +61,12 @@ class BreadthFirstPathfinder(nodes: List<NodeState>, private val rowSize: Int) :
     private fun markPath(destinationNode: VisitedNode) {
         var cameFromNode = checkNotNull(destinationNode.cameFrom)
         while (cameFromNode.nodeState != QueuedNode.START) {
-            nodes[cameFromNode.index] = NodeState.PATH
+            board[cameFromNode.index] = NodeState.PATH
             cameFromNode = checkNotNull(cameFromNode.cameFrom)
         }
     }
 
-    private class VisitedNode(val index: Int, val nodeState: QueuedNode, val cameFrom: VisitedNode?)
+    private class VisitedNode(val index: NodeIndex, val nodeState: QueuedNode, val cameFrom: VisitedNode?)
 
     private enum class QueuedNode {
         START, DESTINATION, QUEUED;

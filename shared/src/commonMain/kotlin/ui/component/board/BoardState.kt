@@ -3,15 +3,14 @@ package ui.component.board
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -21,6 +20,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
+import pathfinder.Board.NodeIndex
 import pathfinder.Pathfinder
 import pathfinder.PathfinderFactory
 import pathfinder.PathfinderType
@@ -37,74 +37,51 @@ class BoardState private constructor(
     val nodeCountY: Int,
     private val scope: CoroutineScope,
     private val density: Density,
-    savedNodes: List<NodeState>?
+    boardToRestore: ObservableBoard?
 ) {
 
-    private var draggedNode: NodeState? = null
-    private val isDraggingNode get() = draggedNode != null
+    private var draggedNodeIndex: NodeIndex? = null
+    private val isDraggingNode get() = draggedNodeIndex != null
     private var toggleToNodeState: NodeState? = null
-    private var previousDragNodeIndex: NodeIndex = NodeIndex(-1)
-    private val nodes = mutableStateListOf<NodeState>()
-    private var savedNodes = mutableListOf<NodeState>()
+    private var previousDragNodeIndex = NodeIndex(-1)
+    private var board: ObservableBoard by mutableStateOf(boardToRestore ?: ObservableBoard(nodeCountX, nodeCountY))
+    private var savedBoard: ObservableBoard? = null
     var pathfinderType by mutableStateOf(PathfinderType.BREADTH_FIRST)
     private var controlState by mutableStateOf(ControlState.IDLE)
     val isBoardIdle by derivedStateOf { controlState == ControlState.IDLE }
     val isBoardSearchFinished by derivedStateOf { controlState == ControlState.SEARCH_FINISHED }
 
-    init {
-        fillNodes(savedNodes)
-    }
-
     constructor(nodeCountX: Int, nodeCountY: Int, scope: CoroutineScope, density: Density) : this(nodeCountX, nodeCountY, scope, density, null)
 
-    private fun fillNodes(savedNodes: List<NodeState>?) {
-        nodes.addAll(
-            savedNodes ?: generateNodes(
-                startPosition = getNodeIndex(x = 0, y = 0),
-                endPosition = getNodeIndex(x = nodeCountX - 1, y = nodeCountY - 1)
-            )
-        )
-    }
-
-    private fun generateNodes(startPosition: Int, endPosition: Int): List<NodeState> {
-        return (0..<nodeCountX * nodeCountY).map { index ->
-            when (index) {
-                startPosition -> NodeState.START
-                endPosition -> NodeState.DESTINATION
-                else -> NodeState.EMPTY
-            }
-        }
-    }
-
     fun onNodeClick(nodeSize: Dp, pointerPosition: Offset) {
-        if (controlState != ControlState.IDLE) return
-
-        getNodeIndexFor(nodeSize, pointerPosition)?.let { nodeIndex ->
-            toggleNode(nodeIndex)
+        if (controlState == ControlState.IDLE) {
+            getNodeIndexFor(nodeSize, pointerPosition)?.let(::toggleNode)
         }
     }
 
     fun onDragStart(nodeSize: Dp, pointerPosition: Offset) {
-        if (controlState != ControlState.IDLE) return
-
-        getNodeIndexFor(nodeSize, pointerPosition)?.let { nodeIndex ->
-            val node = nodes[nodeIndex]
-            if (node.isDraggable) {
-                draggedNode = node
-                previousDragNodeIndex = nodeIndex
-            } else {
-                toggleToNodeState = nodes[nodeIndex].toggleState
+        if (controlState == ControlState.IDLE) {
+            getNodeIndexFor(nodeSize, pointerPosition)?.let { nodeIndex ->
+                val node = board[nodeIndex]
+                if (node.isDraggable) {
+                    draggedNodeIndex = nodeIndex
+                    previousDragNodeIndex = nodeIndex
+                } else {
+                    toggleToNodeState = board[nodeIndex].toggleState
+                }
             }
         }
     }
 
     fun onDrag(nodeSize: Dp, pointerPosition: Offset): Boolean {
-        if (controlState != ControlState.IDLE) return false
-
-        return getNodeIndexFor(nodeSize, pointerPosition)?.let { nodeIndex ->
-            onNodeDrag(nodeIndex)
-            true
-        } ?: false
+        return if (controlState == ControlState.IDLE) {
+            getNodeIndexFor(nodeSize, pointerPosition)?.let { nodeIndex ->
+                onNodeDrag(nodeIndex)
+                true
+            } ?: false
+        } else {
+            false
+        }
     }
 
     private fun onNodeDrag(nodeIndex: NodeIndex) {
@@ -119,34 +96,34 @@ class BoardState private constructor(
     }
 
     private fun moveNode(destinationNodeIndex: NodeIndex) {
-        val sourceNodeIndex = nodes.indexOf(draggedNode)
-        val destinationNode = nodes[destinationNodeIndex]
+        val draggedNodeIndex = checkNotNull(draggedNodeIndex)
 
-        if (destinationNode == NodeState.EMPTY) {
-            nodes[destinationNodeIndex] = nodes[sourceNodeIndex]
-            nodes[sourceNodeIndex] = NodeState.EMPTY
+        if (board[destinationNodeIndex] == NodeState.EMPTY) {
+            board[destinationNodeIndex] = board[draggedNodeIndex]
+            board[draggedNodeIndex] = NodeState.EMPTY
+            this.draggedNodeIndex = destinationNodeIndex
         }
     }
 
     private fun toggleNode(nodeIndex: NodeIndex) {
-        val node = nodes[nodeIndex]
+        val node = board[nodeIndex]
         if (node.isToggleable) {
-            nodes[nodeIndex] = toggleToNodeState ?: checkNotNull(node.toggleState)
+            board[nodeIndex] = toggleToNodeState ?: checkNotNull(node.toggleState)
         }
     }
 
     fun onDragEnd() {
         toggleToNodeState = null
-        draggedNode = null
+        draggedNodeIndex = null
     }
 
     @OptIn(ObsoleteCoroutinesApi::class)
     fun startSearch() {
         check(controlState == ControlState.IDLE) { "Control state is not idle: $controlState" }
 
-        savedNodes = nodes.toMutableList()
+        savedBoard = board.copy()
         controlState = ControlState.SEARCHING
-        val pathfinder = PathfinderFactory.create(pathfinderType, nodes, nodeCountX)
+        val pathfinder = PathfinderFactory.create(pathfinderType, board)
         ticker(ANIMATION_DELAY_MILLIS).also { ticker ->
             scope.launch {
                 ticker.consumeEach { advanceAnimation(ticker, pathfinder) }
@@ -155,32 +132,21 @@ class BoardState private constructor(
     }
 
     private fun advanceAnimation(ticker: ReceiveChannel<Unit>, pathfinder: Pathfinder) {
-        val progress = pathfinder.stepForward()
-        if (progress.searchFinished) {
+        val boardAfterStep = pathfinder.stepForward()
+        if (pathfinder.searchFinished) {
             controlState = ControlState.SEARCH_FINISHED
             ticker.cancel()
         }
-        replaceNodes(progress.nodes)
+        board = boardAfterStep as ObservableBoard
     }
 
     fun removeObstacles() {
-        val iterator = nodes.listIterator()
-        iterator.forEach {
-            if (it == NodeState.OBSTACLE) {
-                iterator.set(NodeState.EMPTY)
-            }
-        }
+        board.removeObstacles()
     }
 
     fun restoreBoard() {
-        replaceNodes(savedNodes)
-        savedNodes.clear()
+        board = checkNotNull(savedBoard).copy()
         controlState = ControlState.IDLE
-    }
-
-    private fun replaceNodes(newNodes: List<NodeState>) {
-        nodes.clear()
-        nodes.addAll(newNodes)
     }
 
     private fun getNodeIndexFor(nodeSize: Dp, pointerPosition: Offset): NodeIndex? {
@@ -195,22 +161,9 @@ class BoardState private constructor(
         }
     }
 
-    fun getNodeStateAtPosition(x: Int, y: Int): NodeState {
-        return nodes[getNodeIndex(y, x)]
+    fun getNodeColorAtPosition(x: Int, y: Int): Color {
+        return board[x, y].color
     }
-
-    private fun getNodeIndex(y: Int, x: Int) = nodeCountX * y + x
-
-    private operator fun SnapshotStateList<NodeState>.get(index: NodeIndex): NodeState {
-        return this[index.index]
-    }
-
-    private operator fun SnapshotStateList<NodeState>.set(index: NodeIndex, newValue: NodeState) {
-        this[index.index] = newValue
-    }
-
-    @JvmInline
-    private value class NodeIndex(val index: Int)
 
     enum class ControlState {
         IDLE, SEARCHING, SEARCH_FINISHED
@@ -219,13 +172,12 @@ class BoardState private constructor(
     companion object {
         private const val ANIMATION_DELAY_MILLIS = 5L
 
-        @Suppress("UNCHECKED_CAST")
         fun Saver(density: Density, scope: CoroutineScope): Saver<BoardState, Any> {
             val keyNodeCountX = "nodeCountX"
             val keyNodeCountY = "nodeCountY"
-            val keyNodes = "nodes"
+            val keyBoard = "board"
             val keyControlState = "controlState"
-            val keySavedNodes = "savedNodes"
+            val keySavedBoard = "savedBoard"
             val keyPathfinderType = "pathfinderType"
 
             return mapSaver(
@@ -233,25 +185,25 @@ class BoardState private constructor(
                     mapOf(
                         keyNodeCountX to boardState.nodeCountX,
                         keyNodeCountY to boardState.nodeCountY,
-                        keyNodes to boardState.nodes.toMutableList(),
+                        keyBoard to ObservableBoard.Saver().run { save(boardState.board) },
+                        keySavedBoard to boardState.savedBoard?.let { savedBoard -> ObservableBoard.Saver().run { save(savedBoard) } },
                         keyControlState to boardState.controlState,
-                        keySavedNodes to boardState.savedNodes,
                         keyPathfinderType to boardState.pathfinderType
                     )
                 },
                 restore = {
                     val controlState = it[keyControlState] as ControlState
-                    val savedNodes = it[keySavedNodes] as List<NodeState>
-                    val nodes = it[keyNodes] as List<NodeState>
+                    val savedBoard = ObservableBoard.Saver().restore(checkNotNull(it[keySavedBoard]))
+                    val board = ObservableBoard.Saver().restore(checkNotNull(it[keyBoard]))
                     // TODO: Restore the pathfinder and continue animation after state restoration
                     val wasSearchingOnStateSave = controlState == ControlState.SEARCHING
-                    val nodesToRestore = if (wasSearchingOnStateSave) savedNodes else nodes
+                    val boardToRestore = if (wasSearchingOnStateSave) savedBoard else board
                     val newControlState = if (wasSearchingOnStateSave) ControlState.IDLE else controlState
 
-                    BoardState(it[keyNodeCountX] as Int, it[keyNodeCountY] as Int, scope, density, nodesToRestore).also { boardState ->
+                    BoardState(it[keyNodeCountX] as Int, it[keyNodeCountY] as Int, scope, density, boardToRestore).also { boardState ->
                         boardState.controlState = newControlState
                         boardState.pathfinderType = it[keyPathfinderType] as PathfinderType
-                        boardState.savedNodes.addAll(savedNodes)
+                        boardState.savedBoard = savedBoard
                     }
                 }
             )

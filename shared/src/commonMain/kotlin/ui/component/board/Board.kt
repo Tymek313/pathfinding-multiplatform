@@ -34,7 +34,7 @@ fun Board(state: BoardState, modifier: Modifier = Modifier) {
                         Box(
                             Modifier
                                 .size(nodeSize)
-                                .background(state.getNodeStateAtPosition(x, y).color)
+                                .background(state.getNodeColorAtPosition(x, y))
                                 .border(1.dp, Color.Black)
                         )
                     }

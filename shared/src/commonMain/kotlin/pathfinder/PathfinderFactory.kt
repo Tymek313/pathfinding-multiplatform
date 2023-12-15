@@ -1,12 +1,10 @@
 package pathfinder
 
-import ui.component.board.NodeState
-
 object PathfinderFactory {
 
-    fun create(pathfinderType: PathfinderType, initialBoardFields: List<NodeState>, rowSize: Int): Pathfinder {
+    fun create(pathfinderType: PathfinderType, board: Board): Pathfinder {
         return when (pathfinderType) {
-            PathfinderType.BREADTH_FIRST -> BreadthFirstPathfinder(initialBoardFields, rowSize)
+            PathfinderType.BREADTH_FIRST -> BreadthFirstPathfinder(board)
         }
     }
 }
