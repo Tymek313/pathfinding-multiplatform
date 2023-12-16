@@ -8,11 +8,12 @@ interface Board {
     fun getNeighborsFor(index: NodeIndex): List<NodeIndex>
     fun removeObstacles()
     fun copy(): Board
-    fun clear()
     operator fun get(index: NodeIndex): NodeState
     operator fun get(x: Int, y: Int): NodeState
     operator fun set(index: NodeIndex, newValue: NodeState)
 
     @JvmInline
     value class NodeIndex(val value: Int)
+
+    companion object
 }

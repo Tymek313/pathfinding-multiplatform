@@ -20,6 +20,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
+import pathfinder.Board
 import pathfinder.Board.NodeIndex
 import pathfinder.Pathfinder
 import pathfinder.PathfinderFactory
@@ -37,15 +38,15 @@ class BoardState private constructor(
     val nodeCountY: Int,
     private val scope: CoroutineScope,
     private val density: Density,
-    boardToRestore: ObservableBoard?
+    boardToRestore: Board?
 ) {
 
     private var draggedNodeIndex: NodeIndex? = null
     private val isDraggingNode get() = draggedNodeIndex != null
     private var toggleToNodeState: NodeState? = null
     private var previousDragNodeIndex = NodeIndex(-1)
-    private var board: ObservableBoard by mutableStateOf(boardToRestore ?: ObservableBoard(nodeCountX, nodeCountY))
-    private var savedBoard: ObservableBoard? = null
+    private var board: Board by mutableStateOf(boardToRestore ?: ObservableBoard(nodeCountX, nodeCountY))
+    private var savedBoard: Board? = null
     var pathfinderType by mutableStateOf(PathfinderType.BREADTH_FIRST)
     private var controlState by mutableStateOf(ControlState.IDLE)
     val isBoardIdle by derivedStateOf { controlState == ControlState.IDLE }
@@ -185,16 +186,16 @@ class BoardState private constructor(
                     mapOf(
                         keyNodeCountX to boardState.nodeCountX,
                         keyNodeCountY to boardState.nodeCountY,
-                        keyBoard to ObservableBoard.Saver().run { save(boardState.board) },
-                        keySavedBoard to boardState.savedBoard?.let { savedBoard -> ObservableBoard.Saver().run { save(savedBoard) } },
+                        keyBoard to Board.save(saverScope = this, boardToSave = boardState.board),
+                        keySavedBoard to boardState.savedBoard?.let { savedBoard -> Board.save(saverScope = this, boardToSave = savedBoard) },
                         keyControlState to boardState.controlState,
                         keyPathfinderType to boardState.pathfinderType
                     )
                 },
                 restore = {
                     val controlState = it[keyControlState] as ControlState
-                    val savedBoard = ObservableBoard.Saver().restore(checkNotNull(it[keySavedBoard]))
-                    val board = ObservableBoard.Saver().restore(checkNotNull(it[keyBoard]))
+                    val savedBoard = it[keySavedBoard]?.let { Board.restore(it) }
+                    val board = Board.restore(checkNotNull(it[keyBoard]))
                     // TODO: Restore the pathfinder and continue animation after state restoration
                     val wasSearchingOnStateSave = controlState == ControlState.SEARCHING
                     val boardToRestore = if (wasSearchingOnStateSave) savedBoard else board

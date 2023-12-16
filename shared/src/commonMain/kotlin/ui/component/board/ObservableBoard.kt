@@ -41,10 +41,6 @@ class ObservableBoard private constructor(private val sizeX: Int, private val no
         return ObservableBoard(sizeX, nodes.toMutableStateList())
     }
 
-    override fun clear() {
-        nodes.clear()
-    }
-
     override fun get(index: NodeIndex): NodeState {
         return nodes[index.value]
     }
@@ -54,10 +50,8 @@ class ObservableBoard private constructor(private val sizeX: Int, private val no
     }
 
     override fun get(x: Int, y: Int): NodeState {
-        return nodes[getNodeIndex(y, x)]
+        return nodes[sizeX * y + x]
     }
-
-    private fun getNodeIndex(y: Int, x: Int) = sizeX * y + x
 
     companion object {
         private fun generateNodes(sizeX: Int, sizeY: Int): SnapshotStateList<NodeState> {
