@@ -5,7 +5,7 @@ import ui.component.board.NodeState
 interface Board {
     val startNodeIndex: NodeIndex
 
-    fun getNeighborsFor(index: NodeIndex): List<NodeIndex>
+    fun getNeighborsFor(index: NodeIndex): Set<NodeIndex>
     fun removeObstacles()
     fun copy(): Board
     operator fun get(index: NodeIndex): NodeState
@@ -13,7 +13,11 @@ interface Board {
     operator fun set(index: NodeIndex, newValue: NodeState)
 
     @JvmInline
-    value class NodeIndex(val value: Int)
+    value class NodeIndex(val value: Int) {
+        init {
+            require(value >= 0) { "Node index cannot be negative" }
+        }
+    }
 
     companion object
 }

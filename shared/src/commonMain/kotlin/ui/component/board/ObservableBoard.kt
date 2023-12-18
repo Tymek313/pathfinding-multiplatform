@@ -5,52 +5,14 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
-import pathfinder.Board
-import pathfinder.Board.NodeIndex
+import pathfinder.AbstractBoard
 
-class ObservableBoard private constructor(private val sizeX: Int, private val nodes: SnapshotStateList<NodeState>) : Board {
-
-    private val nodeCount = nodes.size
-    override val startNodeIndex = NodeIndex(nodes.indexOf(NodeState.START))
+class ObservableBoard private constructor(private val sizeX: Int, private val nodes: SnapshotStateList<NodeState>) : AbstractBoard(sizeX, nodes) {
 
     constructor(sizeX: Int, sizeY: Int) : this(sizeX, generateNodes(sizeX, sizeY))
 
-    override fun getNeighborsFor(index: NodeIndex): List<NodeIndex> {
-        val nodeIndex = index.value
-        val isFirstFieldInRow = nodeIndex % sizeX == 0
-        val isLastFieldInRow = nodeIndex % sizeX == sizeX - 1
-
-        val leftNeighbor = if (isFirstFieldInRow) null else NodeIndex(nodeIndex - 1)
-        val rightNeighbor = if (isLastFieldInRow) null else NodeIndex(nodeIndex + 1)
-        val topNeighbor = (nodeIndex - sizeX).takeIf { it >= 0 }?.let { NodeIndex(it) }
-        val bottomNeighbor = (nodeIndex + sizeX).takeIf { it < nodeCount }?.let { NodeIndex(it) }
-
-        return listOfNotNull(leftNeighbor, rightNeighbor, topNeighbor, bottomNeighbor)
-    }
-
-    override fun removeObstacles() {
-        val iterator = nodes.listIterator()
-        iterator.forEach {
-            if (it == NodeState.OBSTACLE) {
-                iterator.set(NodeState.EMPTY)
-            }
-        }
-    }
-
     override fun copy(): ObservableBoard {
         return ObservableBoard(sizeX, nodes.toMutableStateList())
-    }
-
-    override fun get(index: NodeIndex): NodeState {
-        return nodes[index.value]
-    }
-
-    override fun set(index: NodeIndex, newValue: NodeState) {
-        nodes[index.value] = newValue
-    }
-
-    override fun get(x: Int, y: Int): NodeState {
-        return nodes[sizeX * y + x]
     }
 
     companion object {

@@ -44,7 +44,7 @@ class BoardState private constructor(
     private var draggedNodeIndex: NodeIndex? = null
     private val isDraggingNode get() = draggedNodeIndex != null
     private var toggleToNodeState: NodeState? = null
-    private var previousDragNodeIndex = NodeIndex(-1)
+    private var previousDragNodeIndex: NodeIndex? = null
     private var board: Board by mutableStateOf(boardToRestore ?: ObservableBoard(nodeCountX, nodeCountY))
     private var savedBoard: Board? = null
     var pathfinderType by mutableStateOf(PathfinderType.BREADTH_FIRST)

@@ -21,6 +21,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(kotlin("test-annotations-common"))
+                implementation(kotlin("test-junit"))
             }
         }
         val androidMain by getting {
