@@ -1,7 +1,5 @@
-package ui.pathfinding
+package pathfinding
 
-import pathfinding.Board
-import pathfinding.BreadthFirstPathfinder
 import pathfinding.NodeState.DESTINATION
 import pathfinding.NodeState.EMPTY
 import pathfinding.NodeState.OBSTACLE
@@ -9,7 +7,7 @@ import pathfinding.NodeState.PATH
 import pathfinding.NodeState.QUEUED
 import pathfinding.NodeState.START
 import pathfinding.NodeState.VISITED
-import ui.pathfinding.fake.asTestBoard
+import pathfinding.fake.asTestBoard
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

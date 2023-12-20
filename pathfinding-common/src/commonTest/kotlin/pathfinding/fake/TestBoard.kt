@@ -1,4 +1,4 @@
-package ui.pathfinding.fake
+package pathfinding.fake
 
 import pathfinding.AbstractBoard
 import pathfinding.Board

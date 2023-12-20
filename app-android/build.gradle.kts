@@ -1,5 +1,5 @@
 plugins {
-    alias(versions.plugins.agp)
+    alias(versions.plugins.agp.application)
     alias(versions.plugins.kotlin.android)
 }
 
@@ -30,7 +30,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.5"
+        kotlinCompilerExtensionVersion = versions.versions.composeCompiler.get()
     }
     packaging {
         resources {
@@ -45,16 +45,16 @@ android {
 
 dependencies {
     implementation(project(":shared"))
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.activity:activity-compose:1.8.1")
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
+    implementation(versions.androidx.lifecycle.runtime.ktx)
+    implementation(versions.androidx.activity.compose)
+    implementation(project.dependencies.platform(versions.androidx.compose.bom))
+    implementation(versions.androidx.compose.ui)
+    implementation(versions.androidx.compose.ui.graphics)
+    implementation(versions.androidx.compose.ui.tooling.preview)
+    implementation(versions.androidx.compose.material3)
     testImplementation(versions.junit)
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    androidTestImplementation(project.dependencies.platform(versions.androidx.compose.bom))
+    androidTestImplementation(versions.androidx.compose.ui.test.junit4)
+    debugImplementation(versions.androidx.compose.ui.tooling)
+    debugImplementation(versions.androidx.compose.ui.test.manifest)
 }

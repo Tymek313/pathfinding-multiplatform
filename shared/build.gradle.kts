@@ -15,7 +15,7 @@ kotlin {
                 implementation(compose.ui)
                 implementation(compose.foundation)
                 implementation(compose.material3)
-                api("dev.chrisbanes.material3:material3-window-size-class-multiplatform:0.3.1")
+                api(versions.material3.windowsizeclass)
             }
         }
         val commonTest by getting {
@@ -27,8 +27,8 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                implementation(project.dependencies.platform("androidx.compose:compose-bom:2023.03.00"))
-                implementation("androidx.compose.ui:ui-tooling")
+                implementation(project.dependencies.platform(versions.androidx.compose.bom))
+                implementation(versions.androidx.compose.ui.tooling)
             }
         }
     }
@@ -46,9 +46,9 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.5"
+        kotlinCompilerExtensionVersion = versions.versions.composeCompiler.get()
     }
     kotlin {
-        jvmToolchain(17)
+        jvmToolchain(versions.versions.java.get().toInt())
     }
 }

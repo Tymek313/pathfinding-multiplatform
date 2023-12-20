@@ -2,7 +2,7 @@ plugins {
     alias(versions.plugins.kotlin.jvm) apply false
     alias(versions.plugins.kotlin.multiplatform) apply false
     alias(versions.plugins.compose) apply false
-    alias(versions.plugins.agp) apply false
+    alias(versions.plugins.agp.application) apply false
     alias(versions.plugins.agp.library) apply false
     alias(versions.plugins.kotlin.android) apply false
 }
