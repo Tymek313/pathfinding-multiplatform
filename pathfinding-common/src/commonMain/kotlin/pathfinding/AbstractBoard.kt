@@ -1,6 +1,6 @@
-package pathfinder
+package pathfinding
 
-import pathfinder.Board.NodeIndex
+import pathfinding.Board.NodeIndex
 
 abstract class AbstractBoard(private val rowSize: Int, private val nodes: MutableList<NodeState>) : Board {
 

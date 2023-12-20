@@ -3,7 +3,7 @@ package ui.component.board
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.runtime.saveable.mapSaver
-import pathfinder.Board
+import pathfinding.Board
 import ui.component.board.pathfinder.ObservableBoard
 import kotlin.reflect.KClass
 

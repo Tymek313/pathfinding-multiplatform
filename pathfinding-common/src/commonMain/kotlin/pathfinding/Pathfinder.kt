@@ -1,4 +1,4 @@
-package pathfinder
+package pathfinding
 
 interface Pathfinder {
     val searchFinished: Boolean

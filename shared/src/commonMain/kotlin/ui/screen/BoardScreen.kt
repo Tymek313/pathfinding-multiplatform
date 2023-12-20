@@ -31,7 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import pathfinder.PathfinderType
+import pathfinding.PathfinderType
 import ui.component.board.Board
 import ui.component.board.BoardState
 import ui.component.board.rememberBoardState

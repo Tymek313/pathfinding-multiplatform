@@ -20,12 +20,12 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
-import pathfinder.Board
-import pathfinder.Board.NodeIndex
-import pathfinder.NodeState
-import pathfinder.Pathfinder
-import pathfinder.PathfinderFactory
-import pathfinder.PathfinderType
+import pathfinding.Board
+import pathfinding.Board.NodeIndex
+import pathfinding.NodeState
+import pathfinding.Pathfinder
+import pathfinding.PathfinderFactory
+import pathfinding.PathfinderType
 import ui.component.board.pathfinder.ObservableBoard
 import ui.component.board.pathfinder.color
 

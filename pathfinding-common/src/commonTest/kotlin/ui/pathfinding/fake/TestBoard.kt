@@ -1,8 +1,8 @@
-package ui.pathfinder.fake
+package ui.pathfinding.fake
 
-import pathfinder.AbstractBoard
-import pathfinder.Board
-import pathfinder.NodeState
+import pathfinding.AbstractBoard
+import pathfinding.Board
+import pathfinding.NodeState
 
 class TestBoard(private val rowSize: Int, private val nodes: MutableList<NodeState>) : AbstractBoard(rowSize, nodes) {
 

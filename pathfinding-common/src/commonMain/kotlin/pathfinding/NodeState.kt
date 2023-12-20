@@ -1,4 +1,4 @@
-package pathfinder
+package pathfinding
 
 enum class NodeState(val isDraggable: Boolean, val isQueueable: Boolean) {
     START(isDraggable = true, isQueueable = false) {

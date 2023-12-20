@@ -1,15 +1,15 @@
-package ui.pathfinder
+package ui.pathfinding
 
-import pathfinder.Board
-import pathfinder.BreadthFirstPathfinder
-import pathfinder.NodeState.DESTINATION
-import pathfinder.NodeState.EMPTY
-import pathfinder.NodeState.OBSTACLE
-import pathfinder.NodeState.PATH
-import pathfinder.NodeState.QUEUED
-import pathfinder.NodeState.START
-import pathfinder.NodeState.VISITED
-import ui.pathfinder.fake.asTestBoard
+import pathfinding.Board
+import pathfinding.BreadthFirstPathfinder
+import pathfinding.NodeState.DESTINATION
+import pathfinding.NodeState.EMPTY
+import pathfinding.NodeState.OBSTACLE
+import pathfinding.NodeState.PATH
+import pathfinding.NodeState.QUEUED
+import pathfinding.NodeState.START
+import pathfinding.NodeState.VISITED
+import ui.pathfinding.fake.asTestBoard
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

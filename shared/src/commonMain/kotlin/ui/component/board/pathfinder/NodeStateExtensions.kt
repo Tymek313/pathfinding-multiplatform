@@ -1,7 +1,7 @@
 package ui.component.board.pathfinder
 
 import androidx.compose.ui.graphics.Color
-import pathfinder.NodeState
+import pathfinding.NodeState
 
 val NodeState.color: Color
     get() = when (this) {

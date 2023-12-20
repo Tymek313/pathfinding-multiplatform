@@ -1,4 +1,4 @@
-package pathfinder
+package pathfinding
 
 object PathfinderFactory {
 

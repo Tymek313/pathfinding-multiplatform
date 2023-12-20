@@ -1,4 +1,4 @@
-package pathfinder
+package pathfinding
 
 enum class PathfinderType {
     BREADTH_FIRST

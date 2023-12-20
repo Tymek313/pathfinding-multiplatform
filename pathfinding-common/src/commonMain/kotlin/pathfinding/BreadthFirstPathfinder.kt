@@ -1,8 +1,8 @@
-package pathfinder
+package pathfinding
 
-import pathfinder.Board.NodeIndex
+import pathfinding.Board.NodeIndex
 
-class BreadthFirstPathfinder(board: Board) : Pathfinder {
+internal class BreadthFirstPathfinder(board: Board) : Pathfinder {
 
     private val board = board.copy()
     private val queuedNodes = ArrayDeque<VisitedNode>().apply(::initializeQueue)

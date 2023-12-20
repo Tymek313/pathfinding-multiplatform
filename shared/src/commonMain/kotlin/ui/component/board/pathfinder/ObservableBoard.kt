@@ -5,8 +5,8 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
-import pathfinder.AbstractBoard
-import pathfinder.NodeState
+import pathfinding.AbstractBoard
+import pathfinding.NodeState
 
 class ObservableBoard private constructor(private val sizeX: Int, private val nodes: SnapshotStateList<NodeState>) : AbstractBoard(sizeX, nodes) {
 

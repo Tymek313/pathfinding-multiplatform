@@ -11,6 +11,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(project(":pathfinding-common"))
                 implementation(compose.ui)
                 implementation(compose.foundation)
                 implementation(compose.material3)
