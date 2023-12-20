@@ -1,4 +1,4 @@
-package ui.component.board
+package ui.component.board.pathfinder
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.saveable.Saver
@@ -6,6 +6,7 @@ import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import pathfinder.AbstractBoard
+import pathfinder.NodeState
 
 class ObservableBoard private constructor(private val sizeX: Int, private val nodes: SnapshotStateList<NodeState>) : AbstractBoard(sizeX, nodes) {
 

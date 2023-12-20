@@ -1,7 +1,5 @@
 package pathfinder
 
-import ui.component.board.NodeState
-
 interface Board {
     val startNodeIndex: NodeIndex
 

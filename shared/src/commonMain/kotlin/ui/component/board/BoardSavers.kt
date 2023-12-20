@@ -4,6 +4,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.runtime.saveable.mapSaver
 import pathfinder.Board
+import ui.component.board.pathfinder.ObservableBoard
 import kotlin.reflect.KClass
 
 private const val KEY_CLASS_NAME = "className"
@@ -13,7 +14,7 @@ fun Board.Companion.save(saverScope: SaverScope, boardToSave: Board): Any? = map
     save = { board ->
         mapOf(
             KEY_CLASS_NAME to board::class.qualifiedName,
-            KEY_BOARD to BoardSaverFactory.create(board::class).run { save(board) }
+            KEY_BOARD to createBoardSaverFor(board::class).run { save(board) }
         )
     },
     restore = { error("Saver not intended for restoration") }
@@ -24,20 +25,17 @@ fun Board.Companion.save(saverScope: SaverScope, boardToSave: Board): Any? = map
 fun Board.Companion.restore(data: Any): Board = mapSaver(
     save = { error("Saver not intended for saving") },
     restore = {
-        BoardSaverFactory.create(
+        createBoardSaverFor(
             Class.forName(it[KEY_CLASS_NAME] as String).kotlin
         ).restore(checkNotNull(it[KEY_BOARD]))
     }
 ).restore(data).let(::checkNotNull)
 
 
-private object BoardSaverFactory {
-
-    @Suppress("UNCHECKED_CAST")
-    fun create(boardClass: KClass<*>): Saver<Board, Any> {
-        return when (boardClass) {
-            ObservableBoard::class -> ObservableBoard.Saver()
-            else -> error("Unknown board class: $boardClass")
-        } as Saver<Board, Any>
-    }
+@Suppress("UNCHECKED_CAST")
+private fun createBoardSaverFor(boardClass: KClass<*>): Saver<Board, Any> {
+    return when (boardClass) {
+        ObservableBoard::class -> ObservableBoard.Saver()
+        else -> error("Unknown board class: $boardClass")
+    } as Saver<Board, Any>
 }

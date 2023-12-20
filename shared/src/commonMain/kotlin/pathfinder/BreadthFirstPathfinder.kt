@@ -1,7 +1,6 @@
 package pathfinder
 
 import pathfinder.Board.NodeIndex
-import ui.component.board.NodeState
 
 class BreadthFirstPathfinder(board: Board) : Pathfinder {
 

@@ -22,9 +22,12 @@ import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
 import pathfinder.Board
 import pathfinder.Board.NodeIndex
+import pathfinder.NodeState
 import pathfinder.Pathfinder
 import pathfinder.PathfinderFactory
 import pathfinder.PathfinderType
+import ui.component.board.pathfinder.ObservableBoard
+import ui.component.board.pathfinder.color
 
 @Composable
 fun rememberBoardState(sizeX: Int, sizeY: Int): BoardState {

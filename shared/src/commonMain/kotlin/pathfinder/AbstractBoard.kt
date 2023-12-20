@@ -1,7 +1,6 @@
 package pathfinder
 
 import pathfinder.Board.NodeIndex
-import ui.component.board.NodeState
 
 abstract class AbstractBoard(private val rowSize: Int, private val nodes: MutableList<NodeState>) : Board {
 

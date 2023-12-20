@@ -2,7 +2,7 @@ package ui.pathfinder.fake
 
 import pathfinder.AbstractBoard
 import pathfinder.Board
-import ui.component.board.NodeState
+import pathfinder.NodeState
 
 class TestBoard(private val rowSize: Int, private val nodes: MutableList<NodeState>) : AbstractBoard(rowSize, nodes) {
 

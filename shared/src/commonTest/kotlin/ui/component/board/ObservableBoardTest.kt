@@ -1,6 +1,8 @@
 package ui.component.board
 
 import pathfinder.Board.NodeIndex
+import pathfinder.NodeState
+import ui.component.board.pathfinder.ObservableBoard
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

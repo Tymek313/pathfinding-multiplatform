@@ -2,13 +2,13 @@ package ui.pathfinder
 
 import pathfinder.Board
 import pathfinder.BreadthFirstPathfinder
-import ui.component.board.NodeState.DESTINATION
-import ui.component.board.NodeState.EMPTY
-import ui.component.board.NodeState.OBSTACLE
-import ui.component.board.NodeState.PATH
-import ui.component.board.NodeState.QUEUED
-import ui.component.board.NodeState.START
-import ui.component.board.NodeState.VISITED
+import pathfinder.NodeState.DESTINATION
+import pathfinder.NodeState.EMPTY
+import pathfinder.NodeState.OBSTACLE
+import pathfinder.NodeState.PATH
+import pathfinder.NodeState.QUEUED
+import pathfinder.NodeState.START
+import pathfinder.NodeState.VISITED
 import ui.pathfinder.fake.asTestBoard
 import kotlin.test.Test
 import kotlin.test.assertEquals
