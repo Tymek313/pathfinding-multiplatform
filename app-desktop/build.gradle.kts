@@ -1,8 +1,8 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    alias(versions.plugins.kotlin.jvm)
-    alias(versions.plugins.compose)
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.compose)
 }
 
 group = "pl.pathfinding"
@@ -16,7 +16,7 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "pl.pathfinding.AppKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

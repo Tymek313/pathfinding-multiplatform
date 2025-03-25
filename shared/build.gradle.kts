@@ -1,7 +1,7 @@
 plugins {
-    alias(versions.plugins.compose)
-    alias(versions.plugins.agp.library)
-    alias(versions.plugins.kotlin.multiplatform)
+    alias(libs.plugins.compose)
+    alias(libs.plugins.agp.library)
+    alias(libs.plugins.kotlin.multiplatform)
 }
 
 kotlin {
@@ -15,7 +15,7 @@ kotlin {
                 implementation(compose.ui)
                 implementation(compose.foundation)
                 implementation(compose.material3)
-                api(versions.material3.windowsizeclass)
+                api(libs.material3.windowsizeclass)
             }
         }
         val commonTest by getting {
@@ -27,8 +27,8 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                implementation(project.dependencies.platform(versions.androidx.compose.bom))
-                implementation(versions.androidx.compose.ui.tooling)
+                implementation(project.dependencies.platform(libs.androidx.compose.bom))
+                implementation(libs.androidx.compose.ui.tooling)
             }
         }
     }
@@ -46,9 +46,9 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = versions.versions.composeCompiler.get()
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
     kotlin {
-        jvmToolchain(versions.versions.java.get().toInt())
+        jvmToolchain(libs.versions.java.get().toInt())
     }
 }

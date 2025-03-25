@@ -13,11 +13,3 @@ pluginManagement {
         mavenLocal()
     }
 }
-
-dependencyResolutionManagement {
-    versionCatalogs {
-        create("versions") {
-            from(files("versions.toml"))
-        }
-    }
-}
