@@ -1,10 +1,10 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.kotlin.multiplatform) apply false
-    alias(libs.plugins.compose) apply false
+    kotlin("jvm") version libs.versions.kotlin.get() apply false
+    kotlin("multiplatform") version libs.versions.kotlin.get() apply false
     alias(libs.plugins.agp.application) apply false
     alias(libs.plugins.agp.library) apply false
     alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.compose.compiler) apply false
 }
 
 allprojects {

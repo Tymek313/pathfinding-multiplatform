@@ -52,8 +52,8 @@ fun BoardScreen(windowSizeClass: WindowSizeClass) {
 }
 
 @Composable
-private fun WideBoardScreen(boardState: BoardState) {
-    Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+private fun WideBoardScreen(boardState: BoardState, modifier: Modifier = Modifier) {
+    Row(modifier = modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
         Box(modifier = Modifier.fillMaxHeight().weight(1f), contentAlignment = Alignment.Center) {
             Board(state = boardState)
         }

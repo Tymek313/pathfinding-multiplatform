@@ -1,17 +1,24 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.compose)
+    kotlin("multiplatform")
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.compose.compiler)
 }
 
-group = "pl.pathfinding"
-version = "1.0-SNAPSHOT"
+kotlin {
+    jvm()
+    jvmToolchain(libs.versions.java.get().toInt())
 
-dependencies {
-    implementation(project(":shared"))
-    implementation(compose.material3)
-    implementation(compose.desktop.currentOs)
+    sourceSets {
+        val jvmMain by getting {
+            dependencies {
+                implementation(project(":shared"))
+                implementation(compose.desktop.currentOs)
+                implementation(libs.jetbrains.compose.material3.windowSizeClass)
+            }
+        }
+    }
 }
 
 compose.desktop {
