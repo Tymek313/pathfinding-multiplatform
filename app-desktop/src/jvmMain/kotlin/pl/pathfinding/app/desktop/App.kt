@@ -12,9 +12,9 @@ import androidx.compose.ui.window.rememberWindowState
 import org.jetbrains.compose.resources.stringResource
 import pathfinding.shared.generated.resources.Res
 import pathfinding.shared.generated.resources.graph_pathfinding
+import pl.pathfinding.shared.ui.screen.BoardScreen
 import pl.pathfinding.shared.ui.theme.PathfindingBackground
 import pl.pathfinding.shared.ui.theme.PathfindingTheme
-import pl.pathfinding.shared.ui.screen.BoardScreen
 
 fun main() = application {
     Window(

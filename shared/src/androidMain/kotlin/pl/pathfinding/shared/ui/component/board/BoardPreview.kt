@@ -2,8 +2,6 @@ package pl.pathfinding.shared.ui.component.board
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import pl.pathfinding.shared.ui.component.board.Board
-import pl.pathfinding.shared.ui.component.board.rememberBoardState
 
 @Preview
 @Composable

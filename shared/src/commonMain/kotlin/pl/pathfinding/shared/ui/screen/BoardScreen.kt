@@ -33,13 +33,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import pl.pathfinding.pathfindingcommon.PathfinderType
 import pathfinding.shared.generated.resources.Res
 import pathfinding.shared.generated.resources.breadth_first
 import pathfinding.shared.generated.resources.pathfinding_algorithm
 import pathfinding.shared.generated.resources.remove_obstacles
 import pathfinding.shared.generated.resources.restore_board
 import pathfinding.shared.generated.resources.start_search
+import pl.pathfinding.pathfindingcommon.PathfinderType
 import pl.pathfinding.shared.ui.component.board.Board
 import pl.pathfinding.shared.ui.component.board.BoardState
 import pl.pathfinding.shared.ui.component.board.rememberBoardState
