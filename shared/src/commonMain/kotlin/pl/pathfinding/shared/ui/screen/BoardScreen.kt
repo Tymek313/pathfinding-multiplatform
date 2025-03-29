@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -42,7 +43,8 @@ import pathfinding.shared.generated.resources.start_search
 import pl.pathfinding.shared.ui.component.board.Board
 import pl.pathfinding.shared.ui.component.board.BoardState
 import pl.pathfinding.shared.ui.component.board.rememberBoardState
-import pl.pathfinding.shared.ui.resource.StringRes
+
+private val screenModifier = Modifier.safeDrawingPadding()
 
 @Composable
 fun BoardScreen(windowSizeClass: WindowSizeClass) {
@@ -59,8 +61,8 @@ fun BoardScreen(windowSizeClass: WindowSizeClass) {
 }
 
 @Composable
-private fun WideBoardScreen(boardState: BoardState, modifier: Modifier = Modifier) {
-    Row(modifier = modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+private fun WideBoardScreen(boardState: BoardState) {
+    Row(modifier = screenModifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
         Box(modifier = Modifier.fillMaxHeight().weight(1f), contentAlignment = Alignment.Center) {
             Board(state = boardState)
         }
