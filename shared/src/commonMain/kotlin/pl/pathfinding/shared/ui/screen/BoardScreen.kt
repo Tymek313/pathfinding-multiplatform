@@ -13,11 +13,12 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -89,7 +90,7 @@ private fun WideBoardScreen(boardState: BoardState) {
                     onClick = boardState::restoreBoard
                 )
 
-                Divider(modifier = Modifier.padding(vertical = 8.dp))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                 PathfinderTypeDropdown(
                     isEnabled = boardState.isBoardIdle,
@@ -103,7 +104,7 @@ private fun WideBoardScreen(boardState: BoardState) {
 
 @Composable
 private fun NarrowBoardScreen(boardState: BoardState) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = screenModifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
             Board(boardState)
         }
@@ -170,7 +171,7 @@ private fun PathfinderTypeDropdown(
         onExpandedChange = { if (isEnabled) isPathfinderDropdownExpanded = it }
     ) {
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth().menuAnchor(),
+            modifier = Modifier.fillMaxWidth().menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
             value = stringResource(selectedPathfinderType.pathfinderNameRes),
             onValueChange = {},
             enabled = isEnabled,
