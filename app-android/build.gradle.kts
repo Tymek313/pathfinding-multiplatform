@@ -13,8 +13,11 @@ kotlin {
             dependencies {
                 implementation(project(":shared"))
                 implementation(compose.foundation)
+                implementation(compose.components.resources)
                 implementation(libs.androidx.activity.compose)
+                implementation(libs.androidx.activity)
                 implementation(libs.jetbrains.compose.material3.windowSizeClass)
+                implementation(libs.material)
             }
         }
     }

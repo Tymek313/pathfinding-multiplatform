@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="graph_pathfinding">Przeszukiwanie grafu</string>
+    <string name="start_search">Rozpocznij przeszukiwanie</string>
+    <string name="remove_obstacles">Usuń przeszkody</string>
+    <string name="restore_board">Przywróć planszę</string>
+    <string name="breadth_first">Przeszukiwanie wszerz</string>
+    <string name="pathfinding_algorithm">Algorytm przeszukiwania</string>
+</resources>

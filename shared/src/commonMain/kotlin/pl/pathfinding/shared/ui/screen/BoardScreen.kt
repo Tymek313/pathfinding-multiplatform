@@ -31,7 +31,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import pl.pathfinding.pathfindingcommon.PathfinderType
+import pathfinding.shared.generated.resources.Res
+import pathfinding.shared.generated.resources.breadth_first
+import pathfinding.shared.generated.resources.pathfinding_algorithm
+import pathfinding.shared.generated.resources.remove_obstacles
+import pathfinding.shared.generated.resources.restore_board
+import pathfinding.shared.generated.resources.start_search
 import pl.pathfinding.shared.ui.component.board.Board
 import pl.pathfinding.shared.ui.component.board.BoardState
 import pl.pathfinding.shared.ui.component.board.rememberBoardState
@@ -63,19 +70,19 @@ private fun WideBoardScreen(boardState: BoardState, modifier: Modifier = Modifie
 
                 ControlButton(
                     modifier = controlButtonModifier,
-                    text = StringRes.startSearch,
+                    text = stringResource(Res.string.start_search),
                     isEnabled = boardState.isBoardIdle,
                     onClick = boardState::startSearch
                 )
                 OutlinedControlButton(
                     modifier = controlButtonModifier,
-                    text = StringRes.removeObstacles,
+                    text = stringResource(Res.string.remove_obstacles),
                     isEnabled = boardState.isBoardIdle,
                     onClick = boardState::removeObstacles
                 )
                 OutlinedControlButton(
                     modifier = controlButtonModifier,
-                    text = StringRes.restoreBoard,
+                    text = stringResource(Res.string.restore_board),
                     isEnabled = boardState.isBoardSearchFinished,
                     onClick = boardState::restoreBoard
                 )
@@ -109,20 +116,20 @@ private fun NarrowBoardScreen(boardState: BoardState) {
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     OutlinedControlButton(
                         modifier = Modifier.weight(1f),
-                        text = StringRes.removeObstacles,
+                        text = stringResource(Res.string.remove_obstacles),
                         isEnabled = boardState.isBoardIdle,
                         onClick = boardState::removeObstacles
                     )
                     OutlinedControlButton(
                         modifier = Modifier.weight(1f),
-                        text = StringRes.restoreBoard,
+                        text = stringResource(Res.string.restore_board),
                         isEnabled = boardState.isBoardSearchFinished,
                         onClick = boardState::restoreBoard
                     )
                 }
                 ControlButton(
                     modifier = Modifier.fillMaxWidth(),
-                    text = StringRes.startSearch,
+                    text = stringResource(Res.string.start_search),
                     isEnabled = boardState.isBoardIdle,
                     onClick = boardState::startSearch
                 )
@@ -162,22 +169,25 @@ private fun PathfinderTypeDropdown(
     ) {
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth().menuAnchor(),
-            value = selectedPathfinderType.pathfinderName,
+            value = stringResource(selectedPathfinderType.pathfinderNameRes),
             onValueChange = {},
             enabled = isEnabled,
-            label = { Text(text = StringRes.pathfindingAlgorithm) },
+            label = { Text(text = stringResource(Res.string.pathfinding_algorithm)) },
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(isPathfinderDropdownExpanded) }
         )
         ExposedDropdownMenu(expanded = isPathfinderDropdownExpanded, onDismissRequest = { isPathfinderDropdownExpanded = false }) {
             PathfinderType.entries.forEach { pathfinderType ->
-                DropdownMenuItem(text = { Text(pathfinderType.pathfinderName) }, onClick = { onPathfinderTypeChange(pathfinderType) })
+                DropdownMenuItem(
+                    text = { Text(text = stringResource(pathfinderType.pathfinderNameRes)) },
+                    onClick = { onPathfinderTypeChange(pathfinderType) }
+                )
             }
         }
     }
 }
 
-private val PathfinderType.pathfinderName
-    @Composable get() = when (this) {
-        PathfinderType.BREADTH_FIRST -> StringRes.breadthFirst
+private val PathfinderType.pathfinderNameRes
+    get() = when (this) {
+        PathfinderType.BREADTH_FIRST -> Res.string.breadth_first
     }

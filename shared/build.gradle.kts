@@ -17,6 +17,7 @@ kotlin {
                 implementation(compose.ui)
                 implementation(compose.foundation)
                 implementation(compose.material3)
+                implementation(compose.components.resources)
                 implementation(libs.jetbrains.compose.material3.windowSizeClass)
                 implementation(libs.kotlinx.coroutines.core)
             }
@@ -35,11 +36,15 @@ kotlin {
     }
 }
 
+compose.resources {
+    publicResClass = true
+}
+
 android {
     compileSdk = libs.versions.androidCompileSdk.get().toInt()
     namespace = "pl.pathfinding.shared"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res", "src/commonMain/resources")
+    sourceSets["main"].res.srcDirs("src/androidMain/res", "src/commonMain/composeResources")
     defaultConfig {
         minSdk = libs.versions.androidMinSdk.get().toInt()
     }

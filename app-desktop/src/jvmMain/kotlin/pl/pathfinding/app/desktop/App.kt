@@ -9,16 +9,18 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import pl.pathfinding.shared.ui.resource.StringRes
-import pl.pathfinding.shared.ui.screen.BoardScreen
+import org.jetbrains.compose.resources.stringResource
+import pathfinding.shared.generated.resources.Res
+import pathfinding.shared.generated.resources.graph_pathfinding
 import pl.pathfinding.shared.ui.theme.PathfindingBackground
 import pl.pathfinding.shared.ui.theme.PathfindingTheme
+import pl.pathfinding.shared.ui.screen.BoardScreen
 
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         state = rememberWindowState(width = 1200.dp, height = 900.dp, position = WindowPosition.Aligned(Alignment.Center)),
-        title = StringRes.graphPathfinding
+        title = stringResource(Res.string.graph_pathfinding)
     ) {
         App()
     }

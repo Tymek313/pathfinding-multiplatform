@@ -15,6 +15,7 @@ kotlin {
             dependencies {
                 implementation(project(":shared"))
                 implementation(compose.desktop.currentOs)
+                implementation(compose.components.resources)
                 implementation(libs.jetbrains.compose.material3.windowSizeClass)
             }
         }
