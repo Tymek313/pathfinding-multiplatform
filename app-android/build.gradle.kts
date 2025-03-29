@@ -23,7 +23,7 @@ kotlin {
 }
 
 android {
-    namespace = "pl.pathfinding"
+    namespace = "pl.pathfinding.app.android"
     compileSdk = libs.versions.androidCompileSdk.get().toInt()
 
     defaultConfig {

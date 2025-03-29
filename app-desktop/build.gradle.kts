@@ -23,7 +23,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "pl.pathfinding.AppKt"
+        mainClass = "pl.pathfinding.app.desktop.AppKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
