@@ -1,13 +1,13 @@
-package pl.pathfinding.shared.ui.component.board.pathfinder
+package pl.pathfinding.shared.ui.component.board
 
 import androidx.compose.ui.graphics.Color
-import pl.pathfinding.pathfindingcommon.NodeState
+import pl.pathfinding.shared.pathfinder.NodeState
 
-val NodeState.color: Color
+internal val NodeState.color: Color
     get() = when (this) {
         NodeState.START -> Color.Green
         NodeState.DESTINATION -> Color.Red
-        NodeState.EMPTY -> Color.White
+        NodeState.TRAVERSABLE -> Color.White
         NodeState.OBSTACLE -> Color.Black
         NodeState.PATH -> Color.Cyan
         NodeState.VISITED -> Color.Gray

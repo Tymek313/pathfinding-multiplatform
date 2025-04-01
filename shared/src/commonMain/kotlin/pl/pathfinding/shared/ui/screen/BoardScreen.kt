@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
@@ -22,17 +23,20 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import pathfinding.shared.generated.resources.Res
 import pathfinding.shared.generated.resources.breadth_first
@@ -40,7 +44,7 @@ import pathfinding.shared.generated.resources.pathfinding_algorithm
 import pathfinding.shared.generated.resources.remove_obstacles
 import pathfinding.shared.generated.resources.restore_board
 import pathfinding.shared.generated.resources.start_search
-import pl.pathfinding.pathfindingcommon.PathfinderType
+import pl.pathfinding.shared.pathfinder.PathfinderType
 import pl.pathfinding.shared.ui.component.board.Board
 import pl.pathfinding.shared.ui.component.board.BoardState
 import pl.pathfinding.shared.ui.component.board.rememberBoardState
@@ -49,9 +53,9 @@ private val screenModifier = Modifier.safeDrawingPadding()
 
 @Composable
 fun BoardScreen(windowSizeClass: WindowSizeClass) {
-    val boardState = rememberBoardState(sizeX = 20, sizeY = 20)
-    val isWideScreen = remember(windowSizeClass) {
-        windowSizeClass.widthSizeClass.let { it == WindowWidthSizeClass.Expanded || it == WindowWidthSizeClass.Medium }
+    val boardState = rememberBoardState(size = 20)
+    val isWideScreen = remember(windowSizeClass.widthSizeClass) {
+        windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded || windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
     }
 
     if (isWideScreen) {
@@ -61,21 +65,24 @@ fun BoardScreen(windowSizeClass: WindowSizeClass) {
     }
 }
 
+private val controlButtonModifier = Modifier.fillMaxWidth()
+
 @Composable
 private fun WideBoardScreen(boardState: BoardState) {
+    val scope = rememberCoroutineScope()
+
     Row(modifier = screenModifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
         Box(modifier = Modifier.fillMaxHeight().weight(1f), contentAlignment = Alignment.Center) {
             Board(state = boardState)
         }
         Card(modifier = Modifier.width(IntrinsicSize.Min).padding(16.dp)) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                val controlButtonModifier = Modifier.fillMaxWidth()
 
                 ControlButton(
                     modifier = controlButtonModifier,
                     text = stringResource(Res.string.start_search),
                     isEnabled = boardState.isBoardIdle,
-                    onClick = boardState::startSearch
+                    onClick = { scope.launch { boardState.startSearch() } }
                 )
                 OutlinedControlButton(
                     modifier = controlButtonModifier,
@@ -104,11 +111,13 @@ private fun WideBoardScreen(boardState: BoardState) {
 
 @Composable
 private fun NarrowBoardScreen(boardState: BoardState) {
+    val scope = rememberCoroutineScope()
+
     Column(modifier = screenModifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
             Board(boardState)
         }
-        Card(modifier = Modifier.padding(16.dp)) {
+        Card(modifier = Modifier.padding(16.dp).widthIn(max = 600.dp).align(Alignment.CenterHorizontally)) {
             Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 PathfinderTypeDropdown(
                     modifier = Modifier.fillMaxWidth(),
@@ -134,7 +143,7 @@ private fun NarrowBoardScreen(boardState: BoardState) {
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.start_search),
                     isEnabled = boardState.isBoardIdle,
-                    onClick = boardState::startSearch
+                    onClick = { scope.launch { boardState.startSearch() } }
                 )
             }
         }
@@ -183,7 +192,10 @@ private fun PathfinderTypeDropdown(
             PathfinderType.entries.forEach { pathfinderType ->
                 DropdownMenuItem(
                     text = { Text(text = stringResource(pathfinderType.pathfinderNameRes)) },
-                    onClick = { onPathfinderTypeChange(pathfinderType) }
+                    onClick = {
+                        onPathfinderTypeChange(pathfinderType)
+                        isPathfinderDropdownExpanded = false
+                    }
                 )
             }
         }

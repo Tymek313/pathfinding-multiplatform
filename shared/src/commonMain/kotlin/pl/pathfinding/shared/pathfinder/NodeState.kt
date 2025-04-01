@@ -1,17 +1,17 @@
-package pl.pathfinding.pathfindingcommon
+package pl.pathfinding.shared.pathfinder
 
-enum class NodeState(val isDraggable: Boolean, val isQueueable: Boolean) {
+internal enum class NodeState(val isDraggable: Boolean, val isQueueable: Boolean) {
     START(isDraggable = true, isQueueable = false) {
         override val toggleState: NodeState? = null
     },
     DESTINATION(isDraggable = true, isQueueable = true) {
         override val toggleState: NodeState? = null
     },
-    EMPTY(isDraggable = false, isQueueable = true) {
+    TRAVERSABLE(isDraggable = false, isQueueable = true) {
         override val toggleState get() = OBSTACLE
     },
     OBSTACLE(isDraggable = false, isQueueable = false) {
-        override val toggleState get() = EMPTY
+        override val toggleState get() = TRAVERSABLE
     },
     PATH(isDraggable = false, isQueueable = false) {
         override val toggleState: NodeState? = null
@@ -24,5 +24,4 @@ enum class NodeState(val isDraggable: Boolean, val isQueueable: Boolean) {
     };
 
     abstract val toggleState: NodeState?
-    val isToggleable get() = toggleState != null
 }

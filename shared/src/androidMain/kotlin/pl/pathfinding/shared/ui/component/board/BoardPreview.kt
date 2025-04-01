@@ -6,5 +6,5 @@ import androidx.compose.ui.tooling.preview.Preview
 @Preview
 @Composable
 private fun BoardPreview() {
-    Board(rememberBoardState(sizeX = 20, sizeY = 30))
+    Board(rememberBoardState(size = 20))
 }
