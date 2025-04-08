@@ -1,7 +1,6 @@
 package pl.pathfinding.shared.ui.component.board
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,7 +8,6 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
@@ -29,7 +27,7 @@ internal class BoardState private constructor(
     val nodeCount: Int,
     private val nodes: List<Node>
 ) {
-    private val nodeColors = nodes.map { derivedStateOf { it.state.color } }
+    val nodeColors = nodes.map { derivedStateOf { it.state.color } }
     private var savedNodesStates: List<NodeState>? = null
     private var draggedNodeIndex: Int? = null
     private var nodeStateToToggleOnDrag: NodeState? = null
@@ -162,8 +160,6 @@ internal class BoardState private constructor(
         this.savedNodesStates = null
         searchState = SearchState.IDLE
     }
-
-    fun getNodeColorAt(x: Int, y: Int): State<Color> = nodeColors[y * nodeCount + x]
 
     companion object {
         private const val ANIMATION_DELAY_MILLIS = 5L

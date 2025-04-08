@@ -5,42 +5,53 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import kotlin.math.min
 
 @Composable
 internal fun Board(state: BoardState, modifier: Modifier = Modifier) {
-    Column(
+    BoardLayout(
+        nodeCount = state.nodeCount,
         modifier = modifier
-            .aspectRatio(1f)
             .boardPointerInput(state)
             .onSizeChanged { state.boardSizeInPixels = it.width }
     ) {
-        (0..<state.nodeCount).forEach { y ->
-            Row(modifier = Modifier.weight(1f)) {
-                (0..<state.nodeCount).forEach { x ->
-                    Node(state, x, y, Modifier.weight(1f))
-                }
+        repeat(state.nodeCount * state.nodeCount) { nodeIndex ->
+            Node(state, nodeIndex)
+        }
+    }
+}
+
+private val MAX_NODE_SIZE = 30.dp
+
+@Composable
+private fun BoardLayout(nodeCount: Int, modifier: Modifier, content: @Composable () -> Unit) {
+    Layout(content, modifier) { measurables, constraints ->
+        val boardMaxSize = min(constraints.maxWidth, constraints.maxHeight)
+        val nodeSize = (boardMaxSize / nodeCount).coerceAtMost(MAX_NODE_SIZE.roundToPx())
+        val placeables = measurables.map { it.measure(Constraints.fixed(nodeSize, nodeSize)) }
+        val boardSize = nodeSize * nodeCount
+
+        layout(boardSize, boardSize) {
+            placeables.forEachIndexed { index, placeable ->
+                placeable.placeRelative(index % nodeCount * nodeSize, index / nodeCount * nodeSize)
             }
         }
     }
 }
 
-// New composition restart point
 @Composable
-private fun Node(state: BoardState, x: Int, y: Int, modifier: Modifier) {
+private fun Node(state: BoardState, nodeIndex: Int, modifier: Modifier = Modifier) {
     Box(
         modifier
-            .fillMaxHeight()
-            .background(state.getNodeColorAt(x, y).value)
+            .background(state.nodeColors[nodeIndex].value)
             .border(1.dp, Color.Black)
     )
 }
