@@ -6,6 +6,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -17,13 +18,14 @@ import kotlin.math.min
 
 @Composable
 internal fun Board(state: BoardState, modifier: Modifier = Modifier) {
+    val nodeCount = remember(state.nodeCount) { state.nodeCount * state.nodeCount }
     BoardLayout(
         nodeCount = state.nodeCount,
         modifier = modifier
             .boardPointerInput(state)
             .onSizeChanged { state.boardSizeInPixels = it.width }
     ) {
-        repeat(state.nodeCount * state.nodeCount) { nodeIndex ->
+        repeat(nodeCount) { nodeIndex ->
             Node(state, nodeIndex)
         }
     }
