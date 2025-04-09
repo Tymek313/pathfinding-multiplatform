@@ -15,14 +15,22 @@ import pathfinding.shared.generated.resources.graph_pathfinding
 import pl.pathfinding.shared.ui.screen.BoardScreen
 import pl.pathfinding.shared.ui.theme.PathfindingBackground
 import pl.pathfinding.shared.ui.theme.PathfindingTheme
+import java.io.FileWriter
 
-fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-        state = rememberWindowState(width = 1200.dp, height = 900.dp, position = WindowPosition.Aligned(Alignment.Center)),
-        title = stringResource(Res.string.graph_pathfinding)
-    ) {
-        App()
+fun main() {
+    Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
+        FileWriter("error-log.txt").use { writer ->
+            writer.write(throwable.stackTraceToString())
+        }
+    }
+    application {
+        Window(
+            onCloseRequest = ::exitApplication,
+            state = rememberWindowState(width = 1200.dp, height = 900.dp, position = WindowPosition.Aligned(Alignment.Center)),
+            title = stringResource(Res.string.graph_pathfinding)
+        ) {
+            App()
+        }
     }
 }
 
