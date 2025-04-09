@@ -1,22 +1,33 @@
 # Kotlin Multiplatform Pathfinding App
 
-![pathfinding preview](https://bitbucket.org/tymek313/pathfinding-multiplatform/raw/b692b7c71fbd8b45eecd67ac1024772fc66e6355/preview/pathfinding.gif)
-![pathfinding preview](https://bitbucket.org/tymek313/pathfinding-multiplatform/raw/6baf049ba0cd6e6e25af28a8410354d65a981349/preview/mobile_vertical.jpg)
-![pathfinding preview](https://bitbucket.org/tymek313/pathfinding-multiplatform/raw/23a6266a7866df0b6c3988e6023e079adcf1986f/preview/desktop_narrow.jpg)
-![pathfinding preview](https://bitbucket.org/tymek313/pathfinding-multiplatform/raw/23a6266a7866df0b6c3988e6023e079adcf1986f/preview/mobile_landscape.jpg)
-![pathfinding preview](https://bitbucket.org/tymek313/pathfinding-multiplatform/raw/23a6266a7866df0b6c3988e6023e079adcf1986f/preview/desktop_wide.jpg)
+## 🔨 Latest release builds: [Android](https://bitbucket.org/tymek313/pathfinding-multiplatform/downloads/android-release.apk) | Windows [Part 1](https://bitbucket.org/tymek313/pathfinding-multiplatform/downloads/windows-release.z01) [Part 2](https://bitbucket.org/tymek313/pathfinding-multiplatform/downloads/windows-release.zip)
 
-### Features
+## 🚧 TODO
+- Dynamic board node count adapting to the available space on the screen (to improve experience on smaller screen)
 
-- Finding path from the start node to the destination node using the selected algorithm
+## 🎯 Features
+- __Adaptive layout__ for the best experience on all platforms
+- Breadth first search method
+- Possibility for easy integration of other pathfinding algorithms via existing interface
+- Find path from the start node to the destination node using the selected algorithm and draw the path on the board
 - Placing/removing obstacles
-- Moving start and destination node across the board
-- Adaptive layout for desktop resizable window and mobile(vertical/landscape) screens
+- Moving start and destination nodes across the board
 - Clearing board of the obstacles
-- Multilanguage support (english/polish)
+- Restore board state on activity recreation (Android)
+- Multilanguage support (English/Polish)
 
-### Tech details
-
+## 🔬 Tech details
 - Compose multiplatform
-- Supported platforms: JVM, Android
+- Currently supported platforms: Desktop (Linux, Windows, MacOS), Android
 - Material 3
+
+## 👀 Previews
+
+![android preview gif](https://bitbucket.org/tymek313/pathfinding-multiplatform/raw/master/preview/android.gif)
+![android preview 1](https://bitbucket.org/tymek313/pathfinding-multiplatform/raw/master/preview/android_1.png)
+![android preview 2](https://bitbucket.org/tymek313/pathfinding-multiplatform/raw/master/preview/android_2.png)
+
+![android preview 3](https://bitbucket.org/tymek313/pathfinding-multiplatform/raw/master/preview/android_landscape.png)
+
+![desktop preview 2](https://bitbucket.org/tymek313/pathfinding-multiplatform/raw/master/preview/desktop_narrow.png)
+![desktop preview 1](https://bitbucket.org/tymek313/pathfinding-multiplatform/raw/master/preview/desktop_wide.png)
