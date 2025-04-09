@@ -31,5 +31,9 @@ compose.desktop {
             packageName = "pathfinding"
             packageVersion = "1.0.0"
         }
+        buildTypes.release.proguard {
+            version.set("7.6.0")
+            configurationFiles.from(project.file("proguard-rules.pro"))
+        }
     }
 }
