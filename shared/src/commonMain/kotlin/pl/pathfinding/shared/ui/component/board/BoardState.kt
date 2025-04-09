@@ -49,6 +49,7 @@ internal class BoardState private constructor(
         if (searchState == SearchState.IDLE) {
             getNodeIndexFor(pointerPosition)?.let(::toggleNodeIfEligible)
         }
+        onPointerInputEnd()
     }
 
     fun onDragStart(pointerPosition: Offset) {
@@ -119,7 +120,7 @@ internal class BoardState private constructor(
         }
     }
 
-    fun onDragEnd() {
+    fun onPointerInputEnd() {
         nodeStateToToggleOnDrag = null
         draggedNodeIndex = null
     }

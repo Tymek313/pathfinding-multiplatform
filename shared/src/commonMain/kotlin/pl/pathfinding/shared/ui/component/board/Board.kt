@@ -61,8 +61,7 @@ private fun Node(state: BoardState, nodeIndex: Int, modifier: Modifier = Modifie
 private fun Modifier.boardPointerInput(state: BoardState): Modifier {
     return this then pointerInput(Unit) {
         detectDragGestures(
-            onDragStart = state::onDragStart,
-            onDragEnd = state::onDragEnd,
+            onDragEnd = state::onPointerInputEnd,
             onDrag = { change, _ ->
                 if (state.onDrag(change.position)) {
                     change.consume()
@@ -70,6 +69,6 @@ private fun Modifier.boardPointerInput(state: BoardState): Modifier {
             }
         )
     }.pointerInput(Unit) {
-        detectTapGestures(onTap = state::onNodeClick)
+        detectTapGestures(onTap = state::onNodeClick, onPress = { state.onDragStart(it) })
     }
 }
