@@ -14,6 +14,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.math.min
 
 @Composable
@@ -58,17 +59,21 @@ private fun Node(state: BoardState, nodeIndex: Int, modifier: Modifier = Modifie
     )
 }
 
-private fun Modifier.boardPointerInput(state: BoardState): Modifier {
-    return this then pointerInput(Unit) {
-        detectDragGestures(
-            onDragEnd = state::onPointerInputEnd,
-            onDrag = { change, _ ->
-                if (state.onDrag(change.position)) {
-                    change.consume()
-                }
+private fun Modifier.boardPointerInput(state: BoardState) = pointerInput(Unit) {
+    detectDragGestures(
+        onDragEnd = state::onPointerInputEnd,
+        onDrag = { change, _ ->
+            if (state.onDrag(change.position)) {
+                change.consume()
             }
-        )
-    }.pointerInput(Unit) {
-        detectTapGestures(onTap = state::onNodeClick, onPress = { state.onDragStart(it) })
-    }
+        }
+    )
+}.pointerInput(Unit) {
+    detectTapGestures(onTap = state::onNodeClick, onPress = { state.onDragStart(it) })
+}
+
+@Preview
+@Composable
+private fun BoardPreview() {
+    Board(rememberBoardState(size = 20))
 }

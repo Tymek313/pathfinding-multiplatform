@@ -14,6 +14,8 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(compose.ui)
+                implementation(compose.uiTooling)
+                implementation(compose.components.uiToolingPreview)
                 implementation(compose.foundation)
                 implementation(compose.material3)
                 implementation(compose.components.resources)
@@ -24,12 +26,6 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
-            }
-        }
-        val androidMain by getting {
-            dependencies {
-                implementation(project.dependencies.platform(libs.androidx.compose.bom))
-                implementation(libs.androidx.compose.ui.tooling)
             }
         }
     }

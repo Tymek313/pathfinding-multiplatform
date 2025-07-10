@@ -13,8 +13,6 @@ compose = "1.8.2"
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.2" }
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidxActivity" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
-androidx-compose-bom = { module = "androidx.compose:compose-bom", version = "2025.06.01" }
-androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 jetbrains-compose-material3-windowSizeClass = { module = "org.jetbrains.compose.material3:material3-window-size-class", version.ref = "compose" }
 material = { module = "com.google.android.material:material", version = "1.12.0" }
 
