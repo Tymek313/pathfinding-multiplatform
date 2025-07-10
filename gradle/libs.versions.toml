@@ -1,25 +1,26 @@
 [versions]
 java = "21"
-kotlin = "2.1.10"
+kotlin = "2.2.0"
 androidMinSdk = "24"
 androidTargetSdk = "35"
 androidCompileSdk = "35"
 composeCompiler = "1.5.5"
-agp = "8.9.1"
+agp = "8.11.0"
 androidxActivity = "1.10.1"
+compose = "1.8.2"
 
 [libraries]
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.1" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.2" }
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidxActivity" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
-androidx-compose-bom = { module = "androidx.compose:compose-bom", version = "2025.03.01" }
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version = "2025.06.01" }
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
-jetbrains-compose-material3-windowSizeClass = {module = "org.jetbrains.compose.material3:material3-window-size-class", version = "1.7.3"}
+jetbrains-compose-material3-windowSizeClass = { module = "org.jetbrains.compose.material3:material3-window-size-class", version.ref = "compose" }
 material = { module = "com.google.android.material:material", version = "1.12.0" }
 
 [plugins]
 agp-application = { id = "com.android.application", version.ref = "agp" }
 agp-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-compose-multiplatform = { id = "org.jetbrains.compose", version = "1.7.3" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
