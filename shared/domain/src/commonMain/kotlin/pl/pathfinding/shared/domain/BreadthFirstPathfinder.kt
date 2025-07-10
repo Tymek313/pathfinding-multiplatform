@@ -1,4 +1,4 @@
-package pl.pathfinding.shared.pathfinder
+package pl.pathfinding.shared.domain
 
 internal class BreadthFirstPathfinder(nodes: List<Node>) : Pathfinder {
 

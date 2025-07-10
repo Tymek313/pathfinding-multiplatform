@@ -12,11 +12,11 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.ticker
-import pl.pathfinding.shared.pathfinder.Node
-import pl.pathfinding.shared.pathfinder.NodeState
-import pl.pathfinding.shared.pathfinder.Pathfinder
-import pl.pathfinding.shared.pathfinder.PathfinderFactory
-import pl.pathfinding.shared.pathfinder.PathfinderType
+import pl.pathfinding.shared.domain.Node
+import pl.pathfinding.shared.domain.NodeState
+import pl.pathfinding.shared.domain.Pathfinder
+import pl.pathfinding.shared.domain.PathfinderFactory
+import pl.pathfinding.shared.domain.PathfinderType
 
 @Composable
 internal fun rememberBoardState(size: Int): BoardState {

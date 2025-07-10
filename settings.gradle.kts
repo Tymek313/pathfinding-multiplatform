@@ -2,6 +2,7 @@ rootProject.name = "pathfinding"
 include(":app-android")
 include(":app-desktop")
 include(":shared")
+include(":shared:domain")
 
 pluginManagement {
     repositories {

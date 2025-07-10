@@ -1,6 +1,6 @@
-package pl.pathfinding.shared.pathfinder
+package pl.pathfinding.shared.domain
 
-internal object PathfinderFactory {
+object PathfinderFactory {
 
     fun create(pathfinderType: PathfinderType, nodes: List<Node>): Pathfinder {
         return when (pathfinderType) {

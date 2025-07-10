@@ -1,6 +1,6 @@
-package pl.pathfinding.shared.pathfinder
+package pl.pathfinding.shared.domain
 
-internal sealed interface Pathfinder {
+sealed interface Pathfinder {
     /**
      * @return A value indicating if traversing is finished.
      *

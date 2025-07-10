@@ -1,6 +1,6 @@
-package pl.pathfinding.shared.pathfinder
+package pl.pathfinding.shared.domain
 
-internal enum class NodeState(val isDraggable: Boolean, val isQueueable: Boolean) {
+enum class NodeState(val isDraggable: Boolean, val isQueueable: Boolean) {
     START(isDraggable = true, isQueueable = false) {
         override val toggleState: NodeState? = null
     },

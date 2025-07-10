@@ -44,7 +44,7 @@ import pathfinding.shared.generated.resources.pathfinding_algorithm
 import pathfinding.shared.generated.resources.remove_obstacles
 import pathfinding.shared.generated.resources.restore_board
 import pathfinding.shared.generated.resources.start_search
-import pl.pathfinding.shared.pathfinder.PathfinderType
+import pl.pathfinding.shared.domain.PathfinderType
 import pl.pathfinding.shared.ui.component.board.Board
 import pl.pathfinding.shared.ui.component.board.BoardState
 import pl.pathfinding.shared.ui.component.board.rememberBoardState

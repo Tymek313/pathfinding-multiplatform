@@ -1,7 +1,7 @@
 package pl.pathfinding.shared.ui.component.board
 
-import pl.pathfinding.shared.pathfinder.Node
-import pl.pathfinding.shared.pathfinder.NodeState
+import pl.pathfinding.shared.domain.Node
+import pl.pathfinding.shared.domain.NodeState
 
 internal class NodeFactory {
 

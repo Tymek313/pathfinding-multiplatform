@@ -13,6 +13,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(project(":shared:domain"))
                 implementation(compose.ui)
                 implementation(compose.uiTooling)
                 implementation(compose.components.uiToolingPreview)
