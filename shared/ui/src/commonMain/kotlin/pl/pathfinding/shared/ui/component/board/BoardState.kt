@@ -133,6 +133,7 @@ internal class BoardState(
 
     fun restoreBoard() {
         graph.restoreFromSnapshot(checkNotNull(graphSnapshot))
+        graphSnapshot = null
         searchState = SearchState.IDLE
     }
 
@@ -150,7 +151,11 @@ internal class BoardState(
                     boardState.boardSize,
                     boardState.pathfinderType,
                     GraphSaver.run {
-                        save(boardState.graph.createSnapshot() as DefaultStateGraph.Snapshot)!!
+                        save(
+                            // To avoid issues with ongoing animation state let's restore state from before animation
+                            (boardState.graphSnapshot ?: boardState.graph.createSnapshot())
+                                    as DefaultStateGraph.Snapshot
+                        )!!
                     }
                 )
             },
