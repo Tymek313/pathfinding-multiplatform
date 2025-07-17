@@ -19,8 +19,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import pl.pathfinding.shared.domain.node.NodeId
 import kotlin.math.min
@@ -28,11 +26,12 @@ import kotlin.math.min
 @Composable
 internal fun Board(state: BoardState, modifier: Modifier = Modifier) {
     var boardWidthPx by remember { mutableIntStateOf(0) }
+    val nodeSizePx = remember(boardWidthPx) { boardWidthPx / state.boardSize }
 
     BoardLayout(
         sizeInNodes = state.boardSize,
         modifier = modifier
-            .boardPointerInput(state, boardWidthPx)
+            .boardPointerInput(state, boardWidthPx, nodeSizePx)
             .onSizeChanged { boardWidthPx = it.width }
     ) {
         repeat(state.boardSize * state.boardSize) { nodeIndex ->
@@ -69,40 +68,29 @@ private fun Node(state: BoardState, nodeIndex: Int, modifier: Modifier = Modifie
     )
 }
 
-private fun Modifier.boardPointerInput(state: BoardState, boardWidthPx: Int) = pointerInput(boardWidthPx) {
-    val nodeSizePx = boardWidthPx / state.boardSize
-
-    coroutineScope {
-        launch {
-            detectDragGestures(
-                onDragEnd = state::onPointerInputEnd,
-                onDrag = { change, _ ->
-                    val nodeId = getNodeIdFor(
-                        change.position,
-                        state,
-                        boardWidthPx,
-                        nodeSizePx
-                    )
-                    if (nodeId != null && state.onDrag(nodeId)) {
-                        change.consume()
-                    }
+private fun Modifier.boardPointerInput(state: BoardState, boardWidthPx: Int, nodeSizePx: Int) =
+    pointerInput(boardWidthPx) {
+        detectDragGestures(
+            onDragEnd = state::onPointerInputEnd,
+            onDrag = { change, _ ->
+                val nodeId = getNodeIdFor(change.position, state, boardWidthPx, nodeSizePx)
+                if (nodeId != null && state.onDrag(nodeId)) {
+                    change.consume()
                 }
-            )
-        }
-        launch {
-            detectTapGestures(
-                onTap = { offset ->
-                    getNodeIdFor(offset, state, boardWidthPx, nodeSizePx)
-                        ?.let(state::onNodeClick)
-                },
-                onPress = { offset ->
-                    getNodeIdFor(offset, state, boardWidthPx, nodeSizePx)
-                        ?.let(state::onDragStart)
-                }
-            )
-        }
+            }
+        )
+    }.pointerInput(boardWidthPx) {
+        detectTapGestures(
+            onTap = { offset ->
+                getNodeIdFor(offset, state, boardWidthPx, nodeSizePx)
+                    ?.let(state::onNodeClick)
+            },
+            onPress = { offset ->
+                getNodeIdFor(offset, state, boardWidthPx, nodeSizePx)
+                    ?.let(state::onDragStart)
+            }
+        )
     }
-}
 
 private fun getNodeIdFor(pointerPosition: Offset, state: BoardState, boardWidthPx: Int, nodeSizePx: Int): NodeId? {
     return if (
