@@ -44,7 +44,7 @@ import pathfinding.shared.generated.resources.pathfinding_algorithm
 import pathfinding.shared.generated.resources.remove_obstacles
 import pathfinding.shared.generated.resources.restore_board
 import pathfinding.shared.generated.resources.start_search
-import pl.pathfinding.shared.domain.PathfinderType
+import pl.pathfinding.shared.domain.pathfinder.PathfinderType
 import pl.pathfinding.shared.ui.component.board.Board
 import pl.pathfinding.shared.ui.component.board.BoardState
 import pl.pathfinding.shared.ui.component.board.rememberBoardState
@@ -73,7 +73,7 @@ private fun WideBoardScreen(boardState: BoardState) {
 
     Row(modifier = screenModifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
         Box(modifier = Modifier.fillMaxHeight().weight(1f), contentAlignment = Alignment.Center) {
-            Board(state = boardState)
+            Board(boardState)
         }
         Card(modifier = Modifier.width(IntrinsicSize.Min).padding(16.dp)) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

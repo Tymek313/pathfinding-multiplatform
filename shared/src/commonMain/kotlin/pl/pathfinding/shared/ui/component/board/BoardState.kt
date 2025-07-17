@@ -1,137 +1,114 @@
 package pl.pathfinding.shared.ui.component.board
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.geometry.Offset
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.ticker
-import pl.pathfinding.shared.domain.Node
-import pl.pathfinding.shared.domain.NodeState
-import pl.pathfinding.shared.domain.Pathfinder
-import pl.pathfinding.shared.domain.PathfinderFactory
-import pl.pathfinding.shared.domain.PathfinderType
+import pl.pathfinding.shared.domain.graph.Board
+import pl.pathfinding.shared.domain.graph.DefaultStateGraph
+import pl.pathfinding.shared.domain.graph.StateGraph
+import pl.pathfinding.shared.domain.node.NodeId
+import pl.pathfinding.shared.domain.node.NodeState
+import pl.pathfinding.shared.domain.pathfinder.Pathfinder
+import pl.pathfinding.shared.domain.pathfinder.PathfinderFactory
+import pl.pathfinding.shared.domain.pathfinder.PathfinderType
 
 @Composable
 internal fun rememberBoardState(size: Int): BoardState {
-    return rememberSaveable(size, saver = BoardState.Saver) { BoardState(nodeCount = size, nodeStates = null) }
+    return rememberSaveable(size, saver = BoardState.Saver) {
+        BoardState(size, DefaultStateGraph(Board(size, size)))
+    }
 }
 
-internal class BoardState private constructor(
-    val nodeCount: Int,
-    private val nodes: List<Node>
-) {
-    val nodeColors = nodes.map { derivedStateOf { it.state.color } }
-    private var savedNodesStates: List<NodeState>? = null
-    private var draggedNodeIndex: Int? = null
+internal class BoardState(val boardSize: Int, private val graph: StateGraph) {
+    private val nodeStates by graph.nodeStatesAsState()
+    val nodeIds get() = nodeStates.keys.toList()
+    val nodeIdToColor get() = nodeStates.map { (_, nodeState) -> nodeState.color }
+    private var graphSnapshot: StateGraph.Snapshot? = null
+    private var draggedNodeId: NodeId? = null
     private var nodeStateToToggleOnDrag: NodeState? = null
-    private var previousDragNodeIndex: Int? = null
+    private var previousDragNodeIndex: NodeId? = null
     var pathfinderType by mutableStateOf(PathfinderType.BREADTH_FIRST)
     private var searchState by mutableStateOf(SearchState.IDLE)
     val isBoardIdle by derivedStateOf { searchState == SearchState.IDLE }
     val isBoardSearchFinished by derivedStateOf { searchState == SearchState.FINISHED }
-    var boardSizeInPixels = 0
-        set(value) {
-            field = value
-            nodeSizeInPixels = value / nodeCount.toFloat()
-        }
-    private var nodeSizeInPixels: Float = 0f
 
-    constructor(nodeStates: List<NodeState>?, nodeCount: Int) : this(nodeCount, NodeFactory().createNodes(nodeCount, nodeStates))
-
-    fun onNodeClick(pointerPosition: Offset) {
+    fun onNodeClick(id: NodeId) {
         if (searchState == SearchState.IDLE) {
-            getNodeIndexFor(pointerPosition)?.let(::toggleNodeIfEligible)
+            toggleNodeIfEligible(id)
         }
         onPointerInputEnd()
     }
 
-    fun onDragStart(pointerPosition: Offset) {
+    fun onDragStart(id: NodeId) {
         if (searchState == SearchState.IDLE) {
-            getNodeIndexFor(pointerPosition)?.let { nodeIndex ->
-                val node = nodes[nodeIndex]
-                if (node.state.isDraggable) {
-                    draggedNodeIndex = nodeIndex
-                    previousDragNodeIndex = nodeIndex
-                } else {
-                    nodeStateToToggleOnDrag = nodes[nodeIndex].state.toggleState
-                }
+            val nodeState = graph[id]
+            if (nodeState.isDraggable) {
+                draggedNodeId = id
+                previousDragNodeIndex = id
+            } else {
+                nodeStateToToggleOnDrag = nodeState.toggleState
             }
         }
     }
 
-    fun onDrag(pointerPosition: Offset): Boolean {
+    fun onDrag(id: NodeId): Boolean {
         return if (searchState == SearchState.IDLE) {
-            getNodeIndexFor(pointerPosition)?.let { nodeIndex ->
-                onNodeDrag(nodeIndex)
-                true
-            } ?: false
+            onNodeDrag(id)
+            true
         } else {
             false
         }
     }
 
-    private fun onNodeDrag(nodeIndex: Int) {
-        if (nodeIndex != previousDragNodeIndex) {
-            val draggedNodeIndex = draggedNodeIndex
+    private fun onNodeDrag(id: NodeId) {
+        if (id != previousDragNodeIndex) {
+            val draggedNodeIndex = draggedNodeId
             if (draggedNodeIndex != null) {
-                moveNode(draggedNodeIndex, nodeIndex)
+                moveNode(draggedNodeIndex, id)
             } else {
-                toggleNodeIfEligible(nodeIndex)
-                previousDragNodeIndex = nodeIndex
+                toggleNodeIfEligible(id)
+                previousDragNodeIndex = id
             }
         }
     }
 
-    private fun moveNode(draggedNodeIndex: Int, destinationNodeIndex: Int) {
-        if (nodes[destinationNodeIndex].state == NodeState.TRAVERSABLE) {
-            nodes[destinationNodeIndex].state = nodes[draggedNodeIndex].state
-            nodes[draggedNodeIndex].state = NodeState.TRAVERSABLE
-            this.draggedNodeIndex = destinationNodeIndex
+    private fun moveNode(draggedNode: NodeId, destinationNode: NodeId) {
+        if (graph[destinationNode] == NodeState.TRAVERSABLE) {
+            graph.swap(destinationNode, draggedNode)
+            draggedNodeId = destinationNode
         }
     }
 
-    private fun toggleNodeIfEligible(nodeIndex: Int) {
-        val node = nodes[nodeIndex]
-        val toggleState = node.state.toggleState
+    private fun toggleNodeIfEligible(id: NodeId) {
+        val nodeState = graph[id]
+        val toggleState = nodeState.toggleState
         if (toggleState != null) {
-            nodes[nodeIndex].state = nodeStateToToggleOnDrag ?: toggleState
-        }
-    }
-
-    private fun getNodeIndexFor(pointerPosition: Offset): Int? {
-        check(nodeSizeInPixels > 0) { "Node size was larger than 0" }
-
-        return if (
-            pointerPosition.x > 0 &&
-            pointerPosition.y > 0 &&
-            pointerPosition.x < boardSizeInPixels &&
-            pointerPosition.y < boardSizeInPixels
-        ) {
-            ((pointerPosition.y / nodeSizeInPixels).toInt() * nodeCount) + (pointerPosition.x / nodeSizeInPixels).toInt()
-        } else {
-            null
+            graph[id] = nodeStateToToggleOnDrag ?: toggleState
         }
     }
 
     fun onPointerInputEnd() {
         nodeStateToToggleOnDrag = null
-        draggedNodeIndex = null
+        draggedNodeId = null
     }
 
     @OptIn(ObsoleteCoroutinesApi::class)
     suspend fun startSearch() {
         check(searchState == SearchState.IDLE) { "Search state is not idle: $searchState" }
 
-        savedNodesStates = nodes.map(Node::state)
+        graphSnapshot = graph.createSnapshot()
         searchState = SearchState.IN_PROGRESS
-        val pathfinder = PathfinderFactory.create(pathfinderType, nodes)
+        val pathfinder = PathfinderFactory.create(pathfinderType, graph)
         ticker(ANIMATION_DELAY_MILLIS).also { ticker ->
             ticker.consumeEach { advanceAnimation(ticker, pathfinder) }
         }
@@ -146,43 +123,52 @@ internal class BoardState private constructor(
     }
 
     fun removeObstacles() {
-        nodes.forEachIndexed { index, node ->
-            if (node.state == NodeState.OBSTACLE) {
-                nodes[index].state = NodeState.TRAVERSABLE
-            }
-        }
+        graph.removeObstacles()
     }
 
     fun restoreBoard() {
-        val savedNodesStates = checkNotNull(savedNodesStates)
-        nodes.forEachIndexed { index, node ->
-            node.state = savedNodesStates[index]
-        }
-        this.savedNodesStates = null
+        graph.restoreFromSnapshot(checkNotNull(graphSnapshot))
         searchState = SearchState.IDLE
     }
 
     companion object {
         private const val ANIMATION_DELAY_MILLIS = 5L
 
-        val Saver = listSaver<BoardState, Any?>(
+        private val DefaultStateGraphSaver = listSaver<DefaultStateGraph.Snapshot, Any>(
+            save = { it.toSerializedForm() },
+            restore = { DefaultStateGraph.Snapshot.createFromSerialized(it) }
+        )
+
+        val Saver = listSaver<BoardState, Any>(
             save = { boardState ->
                 listOf(
-                    boardState.nodeCount,
-                    boardState.savedNodesStates ?: boardState.nodes.map(Node::state),
-                    boardState.pathfinderType
+                    boardState.boardSize,
+                    boardState.pathfinderType,
+                    DefaultStateGraphSaver.run {
+                        save(boardState.graph.createSnapshot() as DefaultStateGraph.Snapshot)!!
+                    }
                 )
             },
             restore = {
+                val boardSize = it[0] as Int
+                val pathfinderType = it[1] as PathfinderType
+                val graphSnapshot = DefaultStateGraphSaver.run { restore(it[2])!! }
                 @Suppress("UNCHECKED_CAST")
                 BoardState(
-                    nodeCount = it[0] as Int,
-                    nodeStates = it[1] as List<NodeState>
+                    boardSize = boardSize,
+                    graph = DefaultStateGraph(Board(boardSize, boardSize)).apply {
+                        restoreFromSnapshot(graphSnapshot)
+                    }
                 ).also { boardState ->
-                    boardState.pathfinderType = it[2] as PathfinderType
+                    boardState.pathfinderType = pathfinderType
                 }
             }
         )
-
     }
+}
+
+private fun StateGraph.nodeStatesAsState(): State<Map<NodeId, NodeState>> {
+    val state = mutableStateOf(nodeStates, policy = neverEqualPolicy())
+    onNodeStatesChange = { state.value = it }
+    return state
 }

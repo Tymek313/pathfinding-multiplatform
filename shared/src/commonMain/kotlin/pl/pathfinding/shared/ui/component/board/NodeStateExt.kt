@@ -1,7 +1,7 @@
 package pl.pathfinding.shared.ui.component.board
 
 import androidx.compose.ui.graphics.Color
-import pl.pathfinding.shared.domain.NodeState
+import pl.pathfinding.shared.domain.node.NodeState
 
 internal val NodeState.color: Color
     get() = when (this) {
