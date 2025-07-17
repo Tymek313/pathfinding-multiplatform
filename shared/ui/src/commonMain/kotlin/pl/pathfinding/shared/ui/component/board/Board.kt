@@ -6,6 +6,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -60,9 +61,10 @@ private fun BoardLayout(sizeInNodes: Int, modifier: Modifier, content: @Composab
 
 @Composable
 private fun Node(state: BoardState, nodeIndex: Int, modifier: Modifier = Modifier) {
+    val color by remember { derivedStateOf { state.nodeIdToColor[nodeIndex] } }
     Box(
         modifier
-            .background(state.nodeIdToColor[nodeIndex])
+            .background(color)
             .border(1.dp, Color.Black)
     )
 }
