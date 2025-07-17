@@ -139,7 +139,7 @@ internal class BoardState(
     companion object {
         private const val ANIMATION_DELAY_MILLIS = 5L
 
-        private val DefaultStateGraphSaver = listSaver<DefaultStateGraph.Snapshot, Any>(
+        private val GraphSaver = listSaver<DefaultStateGraph.Snapshot, Any>(
             save = { it.toSerializedForm() },
             restore = { DefaultStateGraph.Snapshot.createFromSerialized(it) }
         )
@@ -149,7 +149,7 @@ internal class BoardState(
                 listOf(
                     boardState.boardSize,
                     boardState.pathfinderType,
-                    DefaultStateGraphSaver.run {
+                    GraphSaver.run {
                         save(boardState.graph.createSnapshot() as DefaultStateGraph.Snapshot)!!
                     }
                 )
@@ -157,7 +157,7 @@ internal class BoardState(
             restore = {
                 val boardSize = it[0] as Int
                 val pathfinderType = it[1] as PathfinderType
-                val graphSnapshot = DefaultStateGraphSaver.run { restore(it[2])!! }
+                val graphSnapshot = GraphSaver.run { restore(it[2])!! }
                 @Suppress("UNCHECKED_CAST")
                 BoardState(
                     boardSize = boardSize,
