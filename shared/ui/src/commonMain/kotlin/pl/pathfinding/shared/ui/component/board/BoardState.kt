@@ -18,6 +18,7 @@ import pl.pathfinding.shared.domain.graph.DefaultStateGraph
 import pl.pathfinding.shared.domain.graph.StateGraph
 import pl.pathfinding.shared.domain.node.NodeId
 import pl.pathfinding.shared.domain.node.NodeState
+import pl.pathfinding.shared.domain.pathfinder.DefaultPathfinderFactory
 import pl.pathfinding.shared.domain.pathfinder.Pathfinder
 import pl.pathfinding.shared.domain.pathfinder.PathfinderFactory
 import pl.pathfinding.shared.domain.pathfinder.PathfinderType
@@ -29,7 +30,11 @@ internal fun rememberBoardState(size: Int): BoardState {
     }
 }
 
-internal class BoardState(val boardSize: Int, private val graph: StateGraph) {
+internal class BoardState(
+    val boardSize: Int,
+    private val graph: StateGraph,
+    private val pathfinderFactory: PathfinderFactory = DefaultPathfinderFactory()
+) {
     private val nodeStates by graph.nodeStatesAsState()
     val nodeIds get() = nodeStates.keys.toList()
     val nodeIdToColor get() = nodeStates.map { (_, nodeState) -> nodeState.color }
@@ -108,7 +113,7 @@ internal class BoardState(val boardSize: Int, private val graph: StateGraph) {
 
         graphSnapshot = graph.createSnapshot()
         searchState = SearchState.IN_PROGRESS
-        val pathfinder = PathfinderFactory.create(pathfinderType, graph)
+        val pathfinder = pathfinderFactory.create(pathfinderType, graph)
         ticker(ANIMATION_DELAY_MILLIS).also { ticker ->
             ticker.consumeEach { advanceAnimation(ticker, pathfinder) }
         }

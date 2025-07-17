@@ -11,7 +11,7 @@ kotlin {
     sourceSets {
         val androidMain by getting {
             dependencies {
-                implementation(project(":shared"))
+                implementation(project(":shared:ui"))
                 implementation(compose.foundation)
                 implementation(compose.components.resources)
                 implementation(libs.androidx.activity.compose)

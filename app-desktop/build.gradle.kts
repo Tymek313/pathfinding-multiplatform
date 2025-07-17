@@ -13,7 +13,7 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             dependencies {
-                implementation(project(":shared"))
+                implementation(project(":shared:ui"))
                 implementation(compose.desktop.currentOs)
                 implementation(compose.components.resources)
                 implementation(libs.jetbrains.compose.material3.windowSizeClass)
