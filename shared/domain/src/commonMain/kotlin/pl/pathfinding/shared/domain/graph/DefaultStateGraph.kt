@@ -30,8 +30,9 @@ class DefaultStateGraph(private val graph: Graph) : StateGraph, Graph by graph {
 
     override fun swapStates(id1: NodeId, id2: NodeId) {
         val state1 = get(id1)
-        set(id1, get(id2))
-        set(id2, state1)
+        _nodeStates[id1] = get(id2)
+        _nodeStates[id2] = state1
+        onNodeStatesChange?.invoke(_nodeStates)
     }
 
     override fun removeAllObstacles() {
