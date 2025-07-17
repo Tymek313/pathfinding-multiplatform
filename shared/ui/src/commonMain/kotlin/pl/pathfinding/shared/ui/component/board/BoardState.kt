@@ -89,7 +89,7 @@ internal class BoardState(
 
     private fun moveNode(draggedNode: NodeId, destinationNode: NodeId) {
         if (graph[destinationNode] == NodeState.TRAVERSABLE) {
-            graph.swap(destinationNode, draggedNode)
+            graph.swapStates(destinationNode, draggedNode)
             draggedNodeId = destinationNode
         }
     }
@@ -128,7 +128,7 @@ internal class BoardState(
     }
 
     fun removeObstacles() {
-        graph.removeObstacles()
+        graph.removeAllObstacles()
     }
 
     fun restoreBoard() {

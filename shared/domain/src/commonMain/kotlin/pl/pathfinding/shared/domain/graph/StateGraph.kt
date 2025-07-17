@@ -9,8 +9,8 @@ interface StateGraph : Graph {
     var onNodeStatesChange: ((Map<NodeId, NodeState>) -> Unit)?
     operator fun get(id: NodeId): NodeState
     operator fun set(id: NodeId, state: NodeState)
-    fun swap(id1: NodeId, id2: NodeId)
-    fun removeObstacles()
+    fun swapStates(id1: NodeId, id2: NodeId)
+    fun removeAllObstacles()
     fun createSnapshot(): Snapshot
     fun restoreFromSnapshot(snapshot: Snapshot)
 

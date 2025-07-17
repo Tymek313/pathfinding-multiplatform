@@ -28,13 +28,13 @@ class DefaultStateGraph(private val graph: Graph) : StateGraph, Graph by graph {
         onNodeStatesChange?.invoke(_nodeStates)
     }
 
-    override fun swap(id1: NodeId, id2: NodeId) {
+    override fun swapStates(id1: NodeId, id2: NodeId) {
         val state1 = get(id1)
         set(id1, get(id2))
         set(id2, state1)
     }
 
-    override fun removeObstacles() {
+    override fun removeAllObstacles() {
         _nodeStates.mapValues { (_, state) ->
             if (state == NodeState.OBSTACLE) {
                 NodeState.TRAVERSABLE
