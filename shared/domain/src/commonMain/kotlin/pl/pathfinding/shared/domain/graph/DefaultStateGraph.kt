@@ -55,7 +55,8 @@ class DefaultStateGraph(private val graph: Graph) : StateGraph, Graph by graph {
     interface Snapshot : StateGraph.Snapshot {
         companion object {
             @Suppress("UNCHECKED_CAST")
-            fun createFromSerialized(values: List<Any>): Snapshot = DefaultSnapshot(values[0] as Map<NodeId, NodeState>)
+            fun createFromSerialized(values: List<Any>): Snapshot =
+                DefaultSnapshot((values[0] as Map<Int, NodeState>).mapKeys { (idValue, _) -> NodeId(idValue) })
         }
     }
 
@@ -65,6 +66,6 @@ class DefaultStateGraph(private val graph: Graph) : StateGraph, Graph by graph {
             stateGraph.onNodeStatesChange?.invoke(nodeStates)
         }
 
-        override fun toSerializedForm(): List<Any> = listOf(nodeStates)
+        override fun toSerializedForm(): List<Any> = listOf(nodeStates.mapKeys { (id, _) -> id.value })
     }
 }
