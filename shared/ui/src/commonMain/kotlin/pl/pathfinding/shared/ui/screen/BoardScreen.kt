@@ -40,6 +40,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import pathfinding.shared.ui.generated.resources.Res
 import pathfinding.shared.ui.generated.resources.breadth_first
+import pathfinding.shared.ui.generated.resources.depth_first
 import pathfinding.shared.ui.generated.resources.pathfinding_algorithm
 import pathfinding.shared.ui.generated.resources.remove_obstacles
 import pathfinding.shared.ui.generated.resources.restore_board
@@ -205,4 +206,5 @@ private fun PathfinderTypeDropdown(
 private val PathfinderType.pathfinderNameRes
     get() = when (this) {
         PathfinderType.BREADTH_FIRST -> Res.string.breadth_first
+        PathfinderType.DEPTH_FIRST -> Res.string.depth_first
     }

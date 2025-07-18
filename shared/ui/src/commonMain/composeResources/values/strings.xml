@@ -5,5 +5,6 @@
     <string name="remove_obstacles">Remove obstacles</string>
     <string name="restore_board">Restore board</string>
     <string name="breadth_first">Breadth first search</string>
+    <string name="depth_first">Depth first search</string>
     <string name="pathfinding_algorithm">Pathfinding algorithm</string>
 </resources>
