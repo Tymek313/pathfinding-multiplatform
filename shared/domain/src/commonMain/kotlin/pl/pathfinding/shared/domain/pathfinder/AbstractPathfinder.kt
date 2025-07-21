@@ -3,7 +3,7 @@ package pl.pathfinding.shared.domain.pathfinder
 import pl.pathfinding.shared.domain.graph.StateGraph
 import pl.pathfinding.shared.domain.node.NodeState
 
-internal abstract class CommonPathfinder(private val graph: StateGraph) : Pathfinder {
+internal abstract class AbstractPathfinder(private val graph: StateGraph) : Pathfinder {
 
     private val queuedNodes = ArrayDeque<Node>().apply {
         addFirst(
