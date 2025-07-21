@@ -21,4 +21,21 @@ class Board(private val sizeX: Int, private val sizeY: Int) : Graph {
     }
 
     override fun getNeighbors(id: NodeId): List<NodeId> = nodesAdjacency.getValue(id)
+
+    override fun getCorrespondingId(idFromThisGraph: NodeId, otherGraph: Graph): NodeId? {
+        if (otherGraph !is Board) {
+            return null
+        }
+
+        val nodeXFromThis = idFromThisGraph.value % sizeY
+        val nodeYFromThis = idFromThisGraph.value / sizeY
+
+        if (nodeXFromThis >= otherGraph.sizeX || nodeYFromThis >= otherGraph.sizeY) {
+            return null
+        }
+
+        val sizeYDifference = otherGraph.sizeY - sizeY
+
+        return otherGraph.nodes[nodeYFromThis * sizeX + nodeYFromThis * sizeYDifference + nodeXFromThis]
+    }
 }

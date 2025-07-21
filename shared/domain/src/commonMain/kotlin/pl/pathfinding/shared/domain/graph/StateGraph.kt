@@ -4,6 +4,7 @@ import pl.pathfinding.shared.domain.node.NodeId
 import pl.pathfinding.shared.domain.node.NodeState
 
 interface StateGraph : Graph {
+    val originalGraph: Graph
     val nodeStates: Map<NodeId, NodeState>
     val startNodeId: NodeId
     var onNodeStatesChange: ((Map<NodeId, NodeState>) -> Unit)?
@@ -15,6 +16,6 @@ interface StateGraph : Graph {
     fun restoreFromSnapshot(snapshot: Snapshot)
 
     interface Snapshot {
-        fun toSerializedForm(): List<Any>
+        fun serialize(): List<Any>
     }
 }

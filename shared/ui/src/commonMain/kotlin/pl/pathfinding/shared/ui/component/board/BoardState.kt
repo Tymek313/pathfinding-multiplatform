@@ -30,9 +30,12 @@ internal fun rememberBoardState(): BoardState {
 }
 
 internal class BoardState(
-    private val pathfinderFactory: PathfinderFactory = DefaultPathfinderFactory()
+    private var boardSize: Int = 0,
+    private val pathfinderFactory: PathfinderFactory = DefaultPathfinderFactory(),
+    initialGraph: StateGraph? = null
 ) {
-    private lateinit var graph: StateGraph
+    private var graph: StateGraph? = initialGraph
+    private val nonNullGraph get() = graph!!
     private var nodeStates: Map<NodeId, NodeState> by mutableStateOf(emptyMap(), neverEqualPolicy())
     val nodeIds get() = nodeStates.keys.toList()
     val nodeIdToColor get() = nodeStates.map { (_, nodeState) -> nodeState.color }
@@ -46,9 +49,10 @@ internal class BoardState(
     val isBoardSearchFinished by derivedStateOf { searchState == SearchState.FINISHED }
 
     fun setupGraph(size: Int) {
-        graph = DefaultStateGraph(Board(size, size))
-        graph.onNodeStatesChange = { nodeStates = it }
-        nodeStates = graph.nodeStates
+        boardSize = size
+        graph = DefaultStateGraph(originalGraph = Board(size, size), previousGraph = graph)
+        nonNullGraph.onNodeStatesChange = { nodeStates = it }
+        nodeStates = nonNullGraph.nodeStates
     }
 
     fun onNodeClick(id: NodeId) {
@@ -60,7 +64,7 @@ internal class BoardState(
 
     fun onDragStart(id: NodeId) {
         if (searchState == SearchState.IDLE) {
-            val nodeState = graph[id]
+            val nodeState = nonNullGraph[id]
             if (nodeState.isDraggable) {
                 draggedNodeId = id
                 previousDragNodeIndex = id
@@ -92,17 +96,17 @@ internal class BoardState(
     }
 
     private fun moveNode(draggedNode: NodeId, destinationNode: NodeId) {
-        if (graph[destinationNode] == NodeState.TRAVERSABLE) {
-            graph.swapStates(destinationNode, draggedNode)
+        if (nonNullGraph[destinationNode] == NodeState.TRAVERSABLE) {
+            nonNullGraph.swapStates(destinationNode, draggedNode)
             draggedNodeId = destinationNode
         }
     }
 
     private fun toggleNodeIfEligible(id: NodeId) {
-        val nodeState = graph[id]
+        val nodeState = nonNullGraph[id]
         val toggleState = nodeState.toggleState
         if (toggleState != null) {
-            graph[id] = nodeStateToToggleOnDrag ?: toggleState
+            nonNullGraph[id] = nodeStateToToggleOnDrag ?: toggleState
         }
     }
 
@@ -115,9 +119,9 @@ internal class BoardState(
     suspend fun startSearch() {
         check(searchState == SearchState.IDLE) { "Search state is not idle: $searchState" }
 
-        graphSnapshot = graph.createSnapshot()
+        graphSnapshot = nonNullGraph.createSnapshot()
         searchState = SearchState.IN_PROGRESS
-        val pathfinder = pathfinderFactory.create(pathfinderType, graph)
+        val pathfinder = pathfinderFactory.create(pathfinderType, nonNullGraph)
         ticker(ANIMATION_DELAY_MILLIS).also { ticker ->
             ticker.consumeEach { advanceAnimation(ticker, pathfinder) }
         }
@@ -132,11 +136,11 @@ internal class BoardState(
     }
 
     fun removeObstacles() {
-        graph.removeAllObstacles()
+        nonNullGraph.removeAllObstacles()
     }
 
     fun restoreBoard() {
-        graph.restoreFromSnapshot(checkNotNull(graphSnapshot))
+        nonNullGraph.restoreFromSnapshot(checkNotNull(graphSnapshot))
         graphSnapshot = null
         searchState = SearchState.IDLE
     }
@@ -144,29 +148,37 @@ internal class BoardState(
     companion object {
         private const val ANIMATION_DELAY_MILLIS = 5L
 
-        private val GraphSaver = listSaver<DefaultStateGraph.Snapshot, Any>(
-            save = { it.toSerializedForm() },
+        private val GraphSnapshotSaver = listSaver<DefaultStateGraph.Snapshot, Any>(
+            save = { it.serialize() },
             restore = { DefaultStateGraph.Snapshot.createFromSerialized(it) }
         )
 
-        val Saver = listSaver<BoardState, Any>(
+        val Saver = listSaver<BoardState, Any?>(
             save = { boardState ->
                 listOf(
+                    boardState.boardSize,
                     boardState.pathfinderType,
-                    GraphSaver.run {
-                        save(
-                            // To avoid issues with ongoing animation state let's restore state from before animation
-                            (boardState.graphSnapshot ?: boardState.graph.createSnapshot())
-                                    as DefaultStateGraph.Snapshot
-                        )!!
+                    GraphSnapshotSaver.run {
+                        // To avoid issues with ongoing animation state let's restore state from before animation
+                        ((boardState.graphSnapshot ?: boardState.graph?.createSnapshot())
+                                as DefaultStateGraph.Snapshot?)?.let { save(it) }
                     }
                 )
             },
-            restore = {
-                val pathfinderType = it[1] as PathfinderType
-                val graphSnapshot = GraphSaver.run { restore(it[2])!! }
+            restore = { values ->
+                val boardSize = values[0] as Int
+                val pathfinderType = values[1] as PathfinderType
+                val graphSnapshot = values[2]?.let { GraphSnapshotSaver.run { restore(it) } }
+
                 @Suppress("UNCHECKED_CAST")
-                BoardState().also { boardState ->
+                BoardState(
+                    boardSize = boardSize,
+                    initialGraph = DefaultStateGraph(Board(boardSize, boardSize)).apply {
+                        if (graphSnapshot != null) {
+                            restoreFromSnapshot(graphSnapshot)
+                        }
+                    }
+                ).also { boardState ->
                     boardState.pathfinderType = pathfinderType
                 }
             }
