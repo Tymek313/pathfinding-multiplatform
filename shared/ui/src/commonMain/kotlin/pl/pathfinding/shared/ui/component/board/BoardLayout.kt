@@ -28,8 +28,8 @@ internal fun BoardLayout(
     val minimalNodeSizePx = density.run { MINIMAL_NODE_SIZE.roundToPx() }
     var boardSizeInNodes by remember { mutableIntStateOf(0) }
 
-    SubcomposeLayout(modifier) { policy ->
-        val boardSize = min(policy.maxWidth, policy.maxHeight)
+    SubcomposeLayout(modifier) { constraints ->
+        val boardSize = min(constraints.maxWidth, constraints.maxHeight)
         val newBoardSizeInNodes = boardSize / minimalNodeSizePx
 
         if (newBoardSizeInNodes != boardSizeInNodes) {
@@ -62,25 +62,34 @@ internal fun BoardLayout(
         layout(boardSize, boardSize) {
             placeables.forEachIndexed { index, placeable ->
                 placeable.place(
-                    getXIndexForNode(index, nodeSizesInRowsAndColumns, boardSizeInNodes),
-                    getYIndexForNode(index, nodeSizesInRowsAndColumns, boardSizeInNodes)
+                    getXNodePosition(index, nodeSizesInRowsAndColumns, boardSizeInNodes),
+                    getYNodePosition(index, nodeSizesInRowsAndColumns, boardSizeInNodes)
                 )
             }
         }
     }
 }
 
-private fun getXIndexForNode(nodeIndex: Int, nodeSizes: List<Int>, boardSizeInNodes: Int): Int {
-    var sum = 0
-    for (i in 0..<nodeIndex % boardSizeInNodes) {
-        sum += nodeSizes[i]
-    }
-    return sum
-}
 
-private fun getYIndexForNode(nodeIndex: Int, nodeSizes: List<Int>, boardSizeInNodes: Int): Int {
+private typealias GetIndexInAxisOperation = (Int, Int) -> Int
+
+private val GetIndexInXAxisOperation: GetIndexInAxisOperation = Int::rem
+private val GetIndexInYAxisOperation: GetIndexInAxisOperation = Int::div
+
+private fun getXNodePosition(placeableIndex: Int, nodeSizes: List<Int>, boardSizeInNodes: Int) =
+    getNodePosition(placeableIndex, nodeSizes, boardSizeInNodes, GetIndexInXAxisOperation)
+
+private fun getYNodePosition(placeableIndex: Int, nodeSizes: List<Int>, boardSizeInNodes: Int) =
+    getNodePosition(placeableIndex, nodeSizes, boardSizeInNodes, GetIndexInYAxisOperation)
+
+private fun getNodePosition(
+    placeableIndex: Int,
+    nodeSizes: List<Int>,
+    boardSizeInNodes: Int,
+    getIndexInAxis: GetIndexInAxisOperation
+): Int {
     var sum = 0
-    for (i in 0..<nodeIndex / boardSizeInNodes) {
+    for (i in 0..<getIndexInAxis(placeableIndex, boardSizeInNodes)) {
         sum += nodeSizes[i]
     }
     return sum
