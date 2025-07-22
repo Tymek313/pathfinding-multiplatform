@@ -1,5 +1,6 @@
 package pl.pathfinding.shared.domain.graph
 
+import pl.pathfinding.shared.domain.map.MutableObservableMap
 import pl.pathfinding.shared.domain.node.NodeId
 import pl.pathfinding.shared.domain.node.NodeState
 
@@ -18,7 +19,7 @@ class DefaultStateGraph(
         get() = _nodeStates.firstNotNullOf { (id, state) ->
             if (state == NodeState.START) id else null
         }
-    override var onNodeStatesChange: ((Map<NodeId, NodeState>) -> Unit)? = null
+    override var onNodeStatesChange: ((Map<NodeId, NodeState>) -> Unit)? by _nodeStates::onChange
 
     private fun createNodeStatesFromScratch() = nodes.associateWith { nodeId ->
         when (nodeId.value) {
@@ -26,14 +27,14 @@ class DefaultStateGraph(
             nodes.size - 1 -> NodeState.DESTINATION
             else -> NodeState.TRAVERSABLE
         }
-    }.toMutableMap()
+    }.toMutableMap().let(::MutableObservableMap)
 
-    private fun createNodeStatesUsingPreviousGraph(previousGraph: StateGraph): MutableMap<NodeId, NodeState> {
+    private fun createNodeStatesUsingPreviousGraph(previousGraph: StateGraph): MutableObservableMap<NodeId, NodeState> {
         val states = nodes.associateWith { nodeId ->
             getCorrespondingId(nodeId, previousGraph.originalGraph)
                 ?.let(previousGraph::get)
                 ?: NodeState.TRAVERSABLE
-        }.toMutableMap()
+        }.toMutableMap().let(::MutableObservableMap)
 
         var shouldAddStartNode = true
         var shouldAddDestinationNode = true
@@ -63,14 +64,10 @@ class DefaultStateGraph(
 
     override fun set(id: NodeId, state: NodeState) {
         _nodeStates[id] = state
-        onNodeStatesChange?.invoke(_nodeStates)
     }
 
     override fun swapStates(id1: NodeId, id2: NodeId) {
-        val state1 = get(id1)
-        _nodeStates[id1] = get(id2)
-        _nodeStates[id2] = state1
-        onNodeStatesChange?.invoke(_nodeStates)
+        _nodeStates.swap(id1, id2)
     }
 
     override fun removeAllObstacles() {
@@ -79,7 +76,6 @@ class DefaultStateGraph(
                 _nodeStates[id] = NodeState.TRAVERSABLE
             }
         }
-        onNodeStatesChange?.invoke(_nodeStates)
     }
 
     override fun createSnapshot(): StateGraph.Snapshot = DefaultSnapshot(_nodeStates.toMutableMap())
@@ -99,7 +95,6 @@ class DefaultStateGraph(
     private class DefaultSnapshot(val nodeStates: Map<NodeId, NodeState>) : Snapshot {
         fun restore(stateGraph: DefaultStateGraph) {
             stateGraph._nodeStates.putAll(nodeStates)
-            stateGraph.onNodeStatesChange?.invoke(nodeStates)
         }
 
         override fun serialize(): List<Any> = listOf(nodeStates.mapKeys { (id, _) -> id.value })
