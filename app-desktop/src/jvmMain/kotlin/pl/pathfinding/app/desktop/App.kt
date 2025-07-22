@@ -10,8 +10,8 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import org.jetbrains.compose.resources.stringResource
-import pathfinding.shared.generated.resources.Res
-import pathfinding.shared.generated.resources.graph_pathfinding
+import pathfinding.shared.ui.generated.resources.Res
+import pathfinding.shared.ui.generated.resources.graph_pathfinding
 import pl.pathfinding.shared.ui.screen.BoardScreen
 import pl.pathfinding.shared.ui.theme.PathfindingBackground
 import pl.pathfinding.shared.ui.theme.PathfindingTheme
@@ -19,6 +19,7 @@ import java.io.FileWriter
 
 fun main() {
     Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
+        throwable.printStackTrace()
         FileWriter("error-log.txt").use { writer ->
             writer.write(throwable.stackTraceToString())
         }

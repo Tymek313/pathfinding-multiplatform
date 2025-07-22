@@ -1,7 +1,6 @@
 package pl.pathfinding.shared.ui.component.board
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,18 +23,17 @@ import pl.pathfinding.shared.domain.pathfinder.PathfinderFactory
 import pl.pathfinding.shared.domain.pathfinder.PathfinderType
 
 @Composable
-internal fun rememberBoardState(size: Int): BoardState {
-    return rememberSaveable(size, saver = BoardState.Saver) {
-        BoardState(size, DefaultStateGraph(Board(size, size)))
+internal fun rememberBoardState(): BoardState {
+    return rememberSaveable(saver = BoardState.Saver) {
+        BoardState()
     }
 }
 
 internal class BoardState(
-    val boardSize: Int,
-    private val graph: StateGraph,
     private val pathfinderFactory: PathfinderFactory = DefaultPathfinderFactory()
 ) {
-    private val nodeStates by graph.nodeStatesAsState()
+    private lateinit var graph: StateGraph
+    private var nodeStates: Map<NodeId, NodeState> by mutableStateOf(emptyMap(), neverEqualPolicy())
     val nodeIds get() = nodeStates.keys.toList()
     val nodeIdToColor get() = nodeStates.map { (_, nodeState) -> nodeState.color }
     private var graphSnapshot: StateGraph.Snapshot? = null
@@ -46,6 +44,12 @@ internal class BoardState(
     private var searchState by mutableStateOf(SearchState.IDLE)
     val isBoardIdle by derivedStateOf { searchState == SearchState.IDLE }
     val isBoardSearchFinished by derivedStateOf { searchState == SearchState.FINISHED }
+
+    fun setupGraph(size: Int) {
+        graph = DefaultStateGraph(Board(size, size))
+        graph.onNodeStatesChange = { nodeStates = it }
+        nodeStates = graph.nodeStates
+    }
 
     fun onNodeClick(id: NodeId) {
         if (searchState == SearchState.IDLE) {
@@ -148,7 +152,6 @@ internal class BoardState(
         val Saver = listSaver<BoardState, Any>(
             save = { boardState ->
                 listOf(
-                    boardState.boardSize,
                     boardState.pathfinderType,
                     GraphSaver.run {
                         save(
@@ -160,25 +163,13 @@ internal class BoardState(
                 )
             },
             restore = {
-                val boardSize = it[0] as Int
                 val pathfinderType = it[1] as PathfinderType
                 val graphSnapshot = GraphSaver.run { restore(it[2])!! }
                 @Suppress("UNCHECKED_CAST")
-                BoardState(
-                    boardSize = boardSize,
-                    graph = DefaultStateGraph(Board(boardSize, boardSize)).apply {
-                        restoreFromSnapshot(graphSnapshot)
-                    }
-                ).also { boardState ->
+                BoardState().also { boardState ->
                     boardState.pathfinderType = pathfinderType
                 }
             }
         )
     }
-}
-
-private fun StateGraph.nodeStatesAsState(): State<Map<NodeId, NodeState>> {
-    val state = mutableStateOf(nodeStates, policy = neverEqualPolicy())
-    onNodeStatesChange = { state.value = it }
-    return state
 }

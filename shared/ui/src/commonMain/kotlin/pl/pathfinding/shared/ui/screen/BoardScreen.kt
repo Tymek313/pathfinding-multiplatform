@@ -54,7 +54,7 @@ private val screenModifier = Modifier.safeDrawingPadding()
 
 @Composable
 fun BoardScreen(windowSizeClass: WindowSizeClass) {
-    val boardState = rememberBoardState(size = 15)
+    val boardState = rememberBoardState()
     val isWideScreen = remember(windowSizeClass.widthSizeClass) {
         windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded || windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
     }
