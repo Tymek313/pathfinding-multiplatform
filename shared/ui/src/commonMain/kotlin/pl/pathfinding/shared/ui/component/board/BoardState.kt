@@ -42,7 +42,6 @@ internal class BoardState(
                 nodeStates = graph.nodeStates
             }
         }
-    private val nonNullGraph get() = graph!!
     private var nodeStates by mutableStateOf(emptyMap<NodeId, NodeState>(), neverEqualPolicy())
     val nodeIds get() = nodeStates.keys.toList()
     val nodeIdToColor get() = nodeStates.map { (_, nodeState) -> nodeState.color }
@@ -84,7 +83,7 @@ internal class BoardState(
 
     fun onDragStart(id: NodeId) {
         if (searchState == SearchState.IDLE) {
-            val nodeState = nonNullGraph[id]
+            val nodeState = requireGraph()[id]
             if (nodeState.isDraggable) {
                 draggedNodeId = id
                 previousDragNodeIndex = id
@@ -116,17 +115,17 @@ internal class BoardState(
     }
 
     private fun moveNode(draggedNode: NodeId, destinationNode: NodeId) {
-        if (nonNullGraph[destinationNode] == NodeState.TRAVERSABLE) {
-            nonNullGraph.swapStates(destinationNode, draggedNode)
+        if (requireGraph()[destinationNode] == NodeState.TRAVERSABLE) {
+            requireGraph().swapStates(destinationNode, draggedNode)
             draggedNodeId = destinationNode
         }
     }
 
     private fun toggleNodeIfEligible(id: NodeId) {
-        val nodeState = nonNullGraph[id]
+        val nodeState = requireGraph()[id]
         val toggleState = nodeState.toggleState
         if (toggleState != null) {
-            nonNullGraph[id] = nodeStateToToggleOnDrag ?: toggleState
+            requireGraph()[id] = nodeStateToToggleOnDrag ?: toggleState
         }
     }
 
@@ -139,9 +138,9 @@ internal class BoardState(
     suspend fun startSearch() {
         check(searchState == SearchState.IDLE) { "Search state is not idle: $searchState" }
 
-        graphSnapshot = nonNullGraph.createSnapshot()
+        graphSnapshot = requireGraph().createSnapshot()
         searchState = SearchState.IN_PROGRESS
-        val pathfinder = pathfinderFactory.create(pathfinderType, nonNullGraph)
+        val pathfinder = pathfinderFactory.create(pathfinderType, requireGraph())
         ticker(ANIMATION_DELAY_MILLIS).also { ticker ->
             ticker.consumeEach {
                 if (!pendingAnimationCancellationApplied(ticker)) {
@@ -171,14 +170,16 @@ internal class BoardState(
     }
 
     fun removeObstacles() {
-        nonNullGraph.removeAllObstacles()
+        requireGraph().removeAllObstacles()
     }
 
     fun restoreBoard() {
-        nonNullGraph.restoreFromSnapshot(checkNotNull(graphSnapshot))
+        requireGraph().restoreFromSnapshot(checkNotNull(graphSnapshot))
         graphSnapshot = null
         searchState = SearchState.IDLE
     }
+
+    private fun requireGraph() = graph!!
 
     companion object {
         private const val ANIMATION_DELAY_MILLIS = 20L
