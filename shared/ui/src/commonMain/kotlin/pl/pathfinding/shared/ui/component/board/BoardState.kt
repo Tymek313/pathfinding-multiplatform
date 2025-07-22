@@ -34,9 +34,16 @@ internal class BoardState(
     private val pathfinderFactory: PathfinderFactory = DefaultPathfinderFactory(),
     initialGraph: StateGraph? = null
 ) {
-    private var graph: StateGraph? = initialGraph
+    private var graph: StateGraph? = null
+        set(graph) {
+            field = graph
+            if (graph != null) {
+                graph.onNodeStatesChange = { nodeStates = it }
+                nodeStates = graph.nodeStates
+            }
+        }
     private val nonNullGraph get() = graph!!
-    private var nodeStates: Map<NodeId, NodeState> by mutableStateOf(emptyMap(), neverEqualPolicy())
+    private var nodeStates by mutableStateOf(emptyMap<NodeId, NodeState>(), neverEqualPolicy())
     val nodeIds get() = nodeStates.keys.toList()
     val nodeIdToColor get() = nodeStates.map { (_, nodeState) -> nodeState.color }
     private var graphSnapshot: StateGraph.Snapshot? = null
@@ -47,16 +54,25 @@ internal class BoardState(
     private var searchState by mutableStateOf(SearchState.IDLE)
     val isBoardIdle by derivedStateOf { searchState == SearchState.IDLE }
     val isBoardSearchFinished by derivedStateOf { searchState == SearchState.FINISHED }
+    private var shouldCancelSearch = false
+
+    init {
+        graph = initialGraph // trigger setter
+    }
 
     fun onBoardSizeChange(graphSizeInNodes: Int) {
         // Might be the case since board size doesn't mean that node count changed
         if (graphSizeInNodes == boardSize) {
             return
         }
+
+        if (searchState == SearchState.IN_PROGRESS) {
+            shouldCancelSearch = true
+            graph!!.restoreFromSnapshot(graphSnapshot!!)
+        }
+
         boardSize = graphSizeInNodes
         graph = DefaultStateGraph(originalGraph = Board(graphSizeInNodes, graphSizeInNodes), previousGraph = graph)
-        nonNullGraph.onNodeStatesChange = { nodeStates = it }
-        nodeStates = nonNullGraph.nodeStates
     }
 
     fun onNodeClick(id: NodeId) {
@@ -127,7 +143,22 @@ internal class BoardState(
         searchState = SearchState.IN_PROGRESS
         val pathfinder = pathfinderFactory.create(pathfinderType, nonNullGraph)
         ticker(ANIMATION_DELAY_MILLIS).also { ticker ->
-            ticker.consumeEach { advanceAnimation(ticker, pathfinder) }
+            ticker.consumeEach {
+                if (!pendingAnimationCancellationApplied(ticker)) {
+                    advanceAnimation(ticker, pathfinder)
+                }
+            }
+        }
+    }
+
+    private fun pendingAnimationCancellationApplied(ticker: ReceiveChannel<Unit>): Boolean {
+        return if (shouldCancelSearch) {
+            shouldCancelSearch = false
+            searchState = SearchState.IDLE
+            ticker.cancel()
+            true
+        } else {
+            false
         }
     }
 
@@ -150,7 +181,7 @@ internal class BoardState(
     }
 
     companion object {
-        private const val ANIMATION_DELAY_MILLIS = 5L
+        private const val ANIMATION_DELAY_MILLIS = 20L
 
         private val GraphSnapshotSaver = listSaver<DefaultStateGraph.Snapshot, Any>(
             save = { it.serialize() },
