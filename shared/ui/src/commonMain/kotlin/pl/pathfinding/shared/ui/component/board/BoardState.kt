@@ -182,7 +182,7 @@ internal class BoardState(
     private fun requireGraph() = graph!!
 
     companion object {
-        private const val ANIMATION_DELAY_MILLIS = 20L
+        private const val ANIMATION_DELAY_MILLIS = 5L
 
         private val GraphSnapshotSaver = listSaver<DefaultStateGraph.Snapshot, Any>(
             save = { it.serialize() },
