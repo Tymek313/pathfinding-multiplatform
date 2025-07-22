@@ -9,18 +9,19 @@ internal fun rememberBoardLayoutCoordinates() = remember { BoardLayoutCoordinate
 
 internal class BoardLayoutCoordinates {
 
-    var nodeIndexUpperOffsetsPx: List<Int>? = null
-    var nodeSizesInRowAndColumns: List<Int>? = null
-        set(value) {
-            field = value
-            var sum = 0
-            nodeIndexUpperOffsetsPx = value!!.mapIndexed { index, nodeSize ->
-                sum += nodeSize
-                sum
-            }
+    private var nodeIndexUpperOffsetsPx: List<Int>? = null
+    private var boardSizeInNodes = 0
+    private var boardSizePx = 0
+
+    fun setNodeSizesInRowAndColumns(sizes: List<Int>) {
+        var sum = 0
+        nodeIndexUpperOffsetsPx = sizes.mapIndexed { index, nodeSize ->
+            sum += nodeSize
+            sum
         }
-    val boardSizeInNodes get() = nodeSizesInRowAndColumns!!.size
-    val boardSizePx get() = nodeSizesInRowAndColumns!!.sum()
+        boardSizeInNodes = sizes.size
+        boardSizePx = sizes.sum()
+    }
 
     fun getNodeIndex(pointerOffset: Offset): Int? {
         return if (
