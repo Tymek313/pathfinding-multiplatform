@@ -48,9 +48,13 @@ internal class BoardState(
     val isBoardIdle by derivedStateOf { searchState == SearchState.IDLE }
     val isBoardSearchFinished by derivedStateOf { searchState == SearchState.FINISHED }
 
-    fun setupGraph(size: Int) {
-        boardSize = size
-        graph = DefaultStateGraph(originalGraph = Board(size, size), previousGraph = graph)
+    fun onBoardSizeChange(graphSizeInNodes: Int) {
+        // Might be the case since board size doesn't mean that node count changed
+        if (graphSizeInNodes == boardSize) {
+            return
+        }
+        boardSize = graphSizeInNodes
+        graph = DefaultStateGraph(originalGraph = Board(graphSizeInNodes, graphSizeInNodes), previousGraph = graph)
         nonNullGraph.onNodeStatesChange = { nodeStates = it }
         nodeStates = nonNullGraph.nodeStates
     }

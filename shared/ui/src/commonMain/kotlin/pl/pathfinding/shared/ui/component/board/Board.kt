@@ -21,9 +21,11 @@ internal fun Board(state: BoardState, modifier: Modifier = Modifier) {
 
     BoardLayout(
         coordinates,
-        onSizeInNodesChange = { state.setupGraph(it) },
         modifier = modifier.boardPointerInput(state, coordinates)
-    ) { nodeCount ->
+    ) { nodeCount, boardSizeInNodes ->
+
+        state.onBoardSizeChange(boardSizeInNodes)
+
         repeat(nodeCount) { nodeIndex ->
             Node(state, nodeIndex)
         }

@@ -22,25 +22,18 @@ private val MINIMAL_NODE_SIZE = 30.dp
 @Composable
 internal fun BoardLayout(
     coordinates: BoardLayoutCoordinates,
-    onSizeInNodesChange: (boardSizeInNodes: Int) -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable (nodeCount: Int) -> Unit
+    content: @Composable (nodeCount: Int, newBoardSizeInNodes: Int) -> Unit
 ) {
     val density = LocalDensity.current
     val minimalNodeSizePx = density.run { MINIMAL_NODE_SIZE.roundToPx() }
-    var boardSizeInNodes by remember { mutableIntStateOf(0) }
 
     SubcomposeLayout(modifier) { constraints ->
         val boardSize = min(constraints.maxWidth, constraints.maxHeight)
-        val newBoardSizeInNodes = boardSize / minimalNodeSizePx
-
-        if (newBoardSizeInNodes != boardSizeInNodes) {
-            boardSizeInNodes = newBoardSizeInNodes
-            onSizeInNodesChange(newBoardSizeInNodes)
-        }
+        val boardSizeInNodes = boardSize / minimalNodeSizePx
 
         val totalNodeCount = boardSizeInNodes * boardSizeInNodes
-        val measurables = subcompose(Unit) { content(totalNodeCount) }
+        val measurables = subcompose(Unit) { content(totalNodeCount, boardSizeInNodes) }
 
         val nodeSize = (boardSize / boardSizeInNodes.toFloat())
         val nodeSizeRounded = nodeSize.roundToInt()
