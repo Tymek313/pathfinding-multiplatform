@@ -31,6 +31,7 @@ internal fun rememberBoardState(): BoardState {
 
 internal class BoardState(
     private var boardSize: Int = 0,
+    private val graphFactory: StateGraphFactory = DefaultStateGraphFactory,
     private val pathfinderFactory: PathfinderFactory = DefaultPathfinderFactory(),
     initialGraph: StateGraph? = null
 ) {
@@ -59,9 +60,9 @@ internal class BoardState(
         graph = initialGraph // trigger setter
     }
 
-    fun onBoardSizeChange(graphSizeInNodes: Int) {
+    fun onBoardSizeChange(boardSizeInNodes: Int) {
         // Might be the case since board size doesn't mean that node count changed
-        if (graphSizeInNodes == boardSize) {
+        if (boardSizeInNodes == boardSize) {
             return
         }
 
@@ -70,8 +71,8 @@ internal class BoardState(
             graph!!.restoreFromSnapshot(graphSnapshot!!)
         }
 
-        boardSize = graphSizeInNodes
-        graph = DefaultStateGraph(originalGraph = Board(graphSizeInNodes, graphSizeInNodes), previousGraph = graph)
+        boardSize = boardSizeInNodes
+        graph = graphFactory.create(boardSizeInNodes, graph)
     }
 
     fun onNodeClick(id: NodeId) {
@@ -184,7 +185,7 @@ internal class BoardState(
     companion object {
         private const val ANIMATION_DELAY_MILLIS = 5L
 
-        private val GraphSnapshotSaver = listSaver<DefaultStateGraph.Snapshot, Any>(
+        private val GraphSnapshotSaver = listSaver<StateGraph.Snapshot, Any>(
             save = { it.serialize() },
             restore = { DefaultStateGraph.Snapshot.createFromSerialized(it) }
         )
@@ -196,8 +197,7 @@ internal class BoardState(
                     boardState.pathfinderType,
                     GraphSnapshotSaver.run {
                         // To avoid issues with ongoing animation state let's restore state from before animation
-                        ((boardState.graphSnapshot ?: boardState.graph?.createSnapshot())
-                                as DefaultStateGraph.Snapshot?)?.let { save(it) }
+                        (boardState.graphSnapshot ?: boardState.graph?.createSnapshot())?.let { save(it) }
                     }
                 )
             },
@@ -209,7 +209,7 @@ internal class BoardState(
                 @Suppress("UNCHECKED_CAST")
                 BoardState(
                     boardSize = boardSize,
-                    initialGraph = DefaultStateGraph(Board(boardSize, boardSize)).apply {
+                    initialGraph = DefaultStateGraphFactory.create(boardSize, null).apply {
                         if (graphSnapshot != null) {
                             restoreFromSnapshot(graphSnapshot)
                         }
