@@ -36,11 +36,9 @@ class DefaultStateGraph(private val graph: Graph) : StateGraph, Graph by graph {
     }
 
     override fun removeAllObstacles() {
-        _nodeStates.mapValues { (_, state) ->
+        _nodeStates.forEach { (id, state) ->
             if (state == NodeState.OBSTACLE) {
-                NodeState.TRAVERSABLE
-            } else {
-                state
+                _nodeStates[id] = NodeState.TRAVERSABLE
             }
         }
         onNodeStatesChange?.invoke(_nodeStates)
