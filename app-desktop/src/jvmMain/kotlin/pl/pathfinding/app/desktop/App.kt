@@ -18,8 +18,6 @@ import pl.pathfinding.shared.ui.screen.BoardScreen
 import pl.pathfinding.shared.ui.theme.PathfindingBackground
 import pl.pathfinding.shared.ui.theme.PathfindingTheme
 import java.awt.Dimension
-import java.io.FileWriter
-import java.io.PrintStream
 import java.io.PrintWriter
 
 fun main() {

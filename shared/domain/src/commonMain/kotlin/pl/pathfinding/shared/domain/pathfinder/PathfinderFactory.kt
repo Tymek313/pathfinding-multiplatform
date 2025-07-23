@@ -6,7 +6,7 @@ interface PathfinderFactory {
     fun create(pathfinderType: PathfinderType, graph: StateGraph): Pathfinder
 }
 
-class DefaultPathfinderFactory: PathfinderFactory {
+class DefaultPathfinderFactory : PathfinderFactory {
     override fun create(pathfinderType: PathfinderType, graph: StateGraph): Pathfinder {
         return when (pathfinderType) {
             PathfinderType.BREADTH_FIRST -> BreadthFirstPathfinder(graph)

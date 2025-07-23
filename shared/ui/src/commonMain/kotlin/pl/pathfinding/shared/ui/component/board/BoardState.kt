@@ -12,7 +12,6 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.ticker
-import pl.pathfinding.shared.domain.graph.Board
 import pl.pathfinding.shared.domain.graph.DefaultStateGraph
 import pl.pathfinding.shared.domain.graph.StateGraph
 import pl.pathfinding.shared.domain.node.NodeId

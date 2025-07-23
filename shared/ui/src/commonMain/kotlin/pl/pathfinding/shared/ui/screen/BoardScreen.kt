@@ -119,7 +119,11 @@ private fun NarrowBoardScreen(boardState: BoardState) {
             Board(boardState)
         }
         Card(modifier = Modifier.padding(16.dp).widthIn(max = 600.dp).align(Alignment.CenterHorizontally)) {
-            Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 PathfinderTypeDropdown(
                     modifier = Modifier.fillMaxWidth(),
                     isEnabled = boardState.isBoardIdle,
@@ -189,7 +193,9 @@ private fun PathfinderTypeDropdown(
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(isPathfinderDropdownExpanded) }
         )
-        ExposedDropdownMenu(expanded = isPathfinderDropdownExpanded, onDismissRequest = { isPathfinderDropdownExpanded = false }) {
+        ExposedDropdownMenu(
+            expanded = isPathfinderDropdownExpanded,
+            onDismissRequest = { isPathfinderDropdownExpanded = false }) {
             PathfinderType.entries.forEach { pathfinderType ->
                 DropdownMenuItem(
                     text = { Text(text = stringResource(pathfinderType.pathfinderNameRes)) },
