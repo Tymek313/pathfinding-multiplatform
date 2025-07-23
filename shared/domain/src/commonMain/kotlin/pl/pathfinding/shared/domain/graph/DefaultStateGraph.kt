@@ -36,6 +36,11 @@ class DefaultStateGraph(
                 ?: NodeState.TRAVERSABLE
         }.toMutableMap().let(::MutableObservableMap)
 
+        ensureStartAndDestinationNodesExist(states)
+        return states
+    }
+
+    private fun ensureStartAndDestinationNodesExist(states: MutableObservableMap<NodeId, NodeState>) {
         var shouldAddStartNode = true
         var shouldAddDestinationNode = true
 
@@ -56,8 +61,6 @@ class DefaultStateGraph(
         if (shouldAddDestinationNode) {
             states[nodes.last()] = NodeState.DESTINATION
         }
-
-        return states
     }
 
     override operator fun get(id: NodeId): NodeState = nodeStates.getValue(id)

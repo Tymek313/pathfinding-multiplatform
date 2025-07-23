@@ -2,6 +2,7 @@ package pl.pathfinding.shared.domain.map
 
 internal class MutableObservableMap<K, V>(
     private val delegate: MutableMap<K, V>
+    // Inherit from Map since this class doesn't implement all MutableMap methods
 ) : Map<K, V> by delegate {
 
     var onChange: ((Map<K, V>) -> Unit)? = null
