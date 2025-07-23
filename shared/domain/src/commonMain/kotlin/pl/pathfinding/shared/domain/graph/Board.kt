@@ -2,16 +2,17 @@ package pl.pathfinding.shared.domain.graph
 
 import pl.pathfinding.shared.domain.node.NodeId
 
-class Board(private val sizeX: Int, private val sizeY: Int) : Graph {
+class Board(private val size: Int) : Graph {
 
-    override val nodes = List(sizeX * sizeY, ::NodeId)
+    override val nodes = List(size * size, ::NodeId)
     private val nodesAdjacency = nodes.associateWith { nodeId ->
         val nodeIndex = nodeId.value
         buildList {
-            val top = if (nodeIndex < sizeY) null else nodes[nodeIndex - sizeX]
-            val left = if (nodeIndex % sizeX == 0) null else nodes[nodeIndex - 1]
-            val right = if (nodeIndex % sizeX == sizeX - 1) null else nodes[nodeIndex + 1]
-            val bottom = if (nodeIndex + sizeX >= nodes.size) null else nodes[nodeIndex + sizeX]
+            val size = this@Board.size
+            val top = if (nodeIndex < size) null else nodes[nodeIndex - size]
+            val left = if (nodeIndex % size == 0) null else nodes[nodeIndex - 1]
+            val right = if (nodeIndex % size == size - 1) null else nodes[nodeIndex + 1]
+            val bottom = if (nodeIndex + size >= nodes.size) null else nodes[nodeIndex + size]
 
             if (top != null) add(top)
             if (left != null) add(left)
@@ -27,15 +28,15 @@ class Board(private val sizeX: Int, private val sizeY: Int) : Graph {
             return null
         }
 
-        val nodeXFromThis = idFromThisGraph.value % sizeY
-        val nodeYFromThis = idFromThisGraph.value / sizeY
+        val nodeXFromThis = idFromThisGraph.value % size
+        val nodeYFromThis = idFromThisGraph.value / size
 
-        if (nodeXFromThis >= otherGraph.sizeX || nodeYFromThis >= otherGraph.sizeY) {
+        if (nodeXFromThis >= otherGraph.size || nodeYFromThis >= otherGraph.size) {
             return null
         }
 
-        val sizeYDifference = otherGraph.sizeY - sizeY
+        val boardSizeDifference = otherGraph.size - size
 
-        return otherGraph.nodes[nodeYFromThis * sizeX + nodeYFromThis * sizeYDifference + nodeXFromThis]
+        return otherGraph.nodes[nodeYFromThis * size + nodeYFromThis * boardSizeDifference + nodeXFromThis]
     }
 }

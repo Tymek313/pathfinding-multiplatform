@@ -11,7 +11,7 @@ internal interface StateGraphFactory {
 internal object DefaultStateGraphFactory : StateGraphFactory {
     override fun create(graphSizeInNodes: Int, previousGraph: StateGraph?): StateGraph {
         return DefaultStateGraph(
-            originalGraph = Board(graphSizeInNodes, graphSizeInNodes),
+            originalGraph = Board(graphSizeInNodes),
             previousGraph = previousGraph
         )
     }
