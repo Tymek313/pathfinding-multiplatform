@@ -15,6 +15,7 @@ androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
 jetbrains-compose-material3-windowSizeClass = { module = "org.jetbrains.compose.material3:material3-window-size-class", version.ref = "compose" }
 material = { module = "com.google.android.material:material", version = "1.12.0" }
+mockk = { module = "io.mockk:mockk", version = "1.13.16" }
 
 [plugins]
 agp-application = { id = "com.android.application", version.ref = "agp" }

@@ -15,11 +15,7 @@ class DefaultStateGraph(
         createNodeStatesUsingPreviousGraph(previousGraph)
     }
     override val nodeStates: Map<NodeId, NodeState> = _nodeStates
-    override val startNodeId
-        get() = _nodeStates.firstNotNullOf { (id, state) ->
-            if (state == NodeState.START) id else null
-        }
-    override var onNodeStatesChange: ((Map<NodeId, NodeState>) -> Unit)? by _nodeStates::onChange
+    override var onNodeStatesChange by _nodeStates::onChange
 
     private fun createNodeStatesFromScratch() = nodes.associateWith { nodeId ->
         when (nodeId.value) {

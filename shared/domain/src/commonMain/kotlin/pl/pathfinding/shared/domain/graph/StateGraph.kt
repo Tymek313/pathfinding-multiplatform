@@ -6,7 +6,6 @@ import pl.pathfinding.shared.domain.node.NodeState
 interface StateGraph : Graph {
     val originalGraph: Graph
     val nodeStates: Map<NodeId, NodeState>
-    val startNodeId: NodeId
     var onNodeStatesChange: ((Map<NodeId, NodeState>) -> Unit)?
     operator fun get(id: NodeId): NodeState
     operator fun set(id: NodeId, state: NodeState)
@@ -19,3 +18,8 @@ interface StateGraph : Graph {
         fun serialize(): List<Any>
     }
 }
+
+val StateGraph.startNodeId
+    get() = nodeStates.firstNotNullOf { (id, state) ->
+        if (state == NodeState.START) id else null
+    }

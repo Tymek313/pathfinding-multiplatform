@@ -4,10 +4,14 @@ import pl.pathfinding.shared.domain.node.NodeId
 
 class Board(private val size: Int) : Graph {
 
+    init {
+        require(size > 0) { "Size of the board should be greater than 0" }
+    }
+
     override val nodes = List(size * size, ::NodeId)
     private val nodesAdjacency = nodes.associateWith { nodeId ->
         val nodeIndex = nodeId.value
-        buildList {
+        buildSet {
             val size = this@Board.size
             val top = if (nodeIndex < size) null else nodes[nodeIndex - size]
             val left = if (nodeIndex % size == 0) null else nodes[nodeIndex - 1]
@@ -21,7 +25,7 @@ class Board(private val size: Int) : Graph {
         }
     }
 
-    override fun getNeighbors(id: NodeId): List<NodeId> = nodesAdjacency.getValue(id)
+    override fun getNeighbors(id: NodeId) = nodesAdjacency.getValue(id)
 
     override fun getCorrespondingId(idFromThisGraph: NodeId, otherGraph: Graph): NodeId? {
         if (otherGraph !is Board) {
