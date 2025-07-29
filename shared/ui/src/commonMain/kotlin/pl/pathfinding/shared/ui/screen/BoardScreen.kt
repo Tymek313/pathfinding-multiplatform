@@ -34,6 +34,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -53,26 +54,25 @@ import pl.pathfinding.shared.ui.component.board.rememberBoardState
 private val screenModifier = Modifier.safeDrawingPadding()
 
 @Composable
-fun BoardScreen(windowSizeClass: WindowSizeClass) {
+fun BoardScreen(windowSizeClass: WindowSizeClass, modifier: Modifier = Modifier) {
     val boardState = rememberBoardState()
-    val isWideScreen = remember(windowSizeClass.widthSizeClass) {
-        windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded || windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
-    }
+    val isWideScreen = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded ||
+            windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
 
     if (isWideScreen) {
-        WideBoardScreen(boardState)
+        WideBoardScreen(boardState, modifier.then(screenModifier))
     } else {
-        NarrowBoardScreen(boardState)
+        NarrowBoardScreen(boardState, modifier.then(screenModifier))
     }
 }
 
 private val controlButtonModifier = Modifier.fillMaxWidth()
 
 @Composable
-private fun WideBoardScreen(boardState: BoardState) {
+private fun WideBoardScreen(boardState: BoardState, modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
 
-    Row(modifier = screenModifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
         Box(modifier = Modifier.fillMaxHeight().weight(1f), contentAlignment = Alignment.Center) {
             Board(boardState)
         }
@@ -111,10 +111,10 @@ private fun WideBoardScreen(boardState: BoardState) {
 }
 
 @Composable
-private fun NarrowBoardScreen(boardState: BoardState) {
+private fun NarrowBoardScreen(boardState: BoardState, modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
 
-    Column(modifier = screenModifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
             Board(boardState)
         }
@@ -208,6 +208,8 @@ private fun PathfinderTypeDropdown(
         }
     }
 }
+
+internal const val TEST_TAG_BOARD = "board"
 
 private val PathfinderType.pathfinderNameRes
     get() = when (this) {

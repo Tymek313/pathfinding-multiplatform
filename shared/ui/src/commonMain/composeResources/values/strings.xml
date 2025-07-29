@@ -7,4 +7,11 @@
     <string name="breadth_first">Breadth first search</string>
     <string name="depth_first">Depth first search</string>
     <string name="pathfinding_algorithm">Pathfinding algorithm</string>
+    <string name="node_state_start">Start</string>
+    <string name="node_state_destination">Destination</string>
+    <string name="node_state_traversable">Traversable</string>
+    <string name="node_state_obstacle">Obstacle</string>
+    <string name="node_state_path">Path</string>
+    <string name="node_state_visited">Visited</string>
+    <string name="node_state_queued">Queued</string>
 </resources>

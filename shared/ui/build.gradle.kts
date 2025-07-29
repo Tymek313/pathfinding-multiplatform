@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+
 plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.agp.library)
@@ -6,8 +9,15 @@ plugins {
 }
 
 kotlin {
-    androidTarget()
-    jvm()
+    androidTarget {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
+        dependencies {
+            androidTestImplementation(libs.androidx.ui.test.junit4.android)
+            debugImplementation(libs.androidx.ui.test.manifest)
+        }
+    }
+    jvm("desktop")
     jvmToolchain(libs.versions.java.get().toInt())
 
     sourceSets {
@@ -27,6 +37,13 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                implementation(compose.uiTest)
+            }
+        }
+        val desktopTest by getting {
+            dependencies {
+                implementation(compose.desktop.currentOs)
             }
         }
     }
@@ -43,6 +60,7 @@ android {
     sourceSets["main"].res.srcDirs("src/androidMain/res", "src/commonMain/composeResources")
     defaultConfig {
         minSdk = libs.versions.androidMinSdk.get().toInt()
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures {
         compose = true

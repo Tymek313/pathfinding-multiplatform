@@ -7,4 +7,11 @@
     <string name="breadth_first">Przeszukiwanie wszerz</string>
     <string name="depth_first">Przeszukiwanie w głąb</string>
     <string name="pathfinding_algorithm">Algorytm przeszukiwania</string>
+    <string name="node_state_start">Start</string>
+    <string name="node_state_destination">Cel</string>
+    <string name="node_state_traversable">Pusty</string>
+    <string name="node_state_obstacle">Przeszkoda</string>
+    <string name="node_state_path">Ścieżka</string>
+    <string name="node_state_visited">Odwiedzony</string>
+    <string name="node_state_queued">Zakolejkowany</string>
 </resources>

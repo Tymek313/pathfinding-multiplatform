@@ -38,13 +38,14 @@ internal class BoardState(
         set(graph) {
             field = graph
             if (graph != null) {
-                graph.onNodeStatesChange = { nodeStates = it }
-                nodeStates = graph.nodeStates
+                graph.onNodeStatesChange = { _nodeStates = it }
+                _nodeStates = graph.nodeStates
             }
         }
-    private var nodeStates by mutableStateOf(emptyMap<NodeId, NodeState>(), neverEqualPolicy())
-    val nodeIds get() = nodeStates.keys.toList()
-    val nodeIdToColor get() = nodeStates.map { (_, nodeState) -> nodeState.color }
+    private var _nodeStates by mutableStateOf(emptyMap<NodeId, NodeState>(), neverEqualPolicy())
+    val nodeStates: Map<NodeId, NodeState> get() = _nodeStates
+    val nodeIds get() = _nodeStates.keys.toList()
+    val nodeIdToColor get() = _nodeStates.map { (_, nodeState) -> nodeState.color }
     private var graphSnapshot: StateGraph.Snapshot? = null
     private var draggedNodeId: NodeId? = null
     private var nodeStateToToggleOnDrag: NodeState? = null
@@ -89,6 +90,7 @@ internal class BoardState(
                 previousDragNodeIndex = id
             } else {
                 nodeStateToToggleOnDrag = nodeState.toggleState
+                toggleNodeIfEligible(id)
             }
         }
     }
