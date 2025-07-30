@@ -16,7 +16,6 @@ import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.unit.dp
-import pl.pathfinding.shared.ui.screen.TEST_TAG_BOARD
 import pl.pathfinding.shared.ui.testutils.assertCorrectTraversableNodeCount
 import pl.pathfinding.shared.ui.testutils.getBoardSizeInNodes
 import pl.pathfinding.shared.ui.testutils.isDestination

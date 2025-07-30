@@ -37,6 +37,7 @@ import pathfinding.shared.ui.generated.resources.depth_first
 import pathfinding.shared.ui.generated.resources.pathfinding_algorithm
 import pathfinding.shared.ui.generated.resources.remove_obstacles
 import pathfinding.shared.ui.generated.resources.start_search
+import pl.pathfinding.shared.ui.component.board.TEST_TAG_BOARD
 import pl.pathfinding.shared.ui.testutils.assertCorrectTraversableNodeCount
 import pl.pathfinding.shared.ui.testutils.breadthFirstString
 import pl.pathfinding.shared.ui.testutils.getBoardSizeInNodes
