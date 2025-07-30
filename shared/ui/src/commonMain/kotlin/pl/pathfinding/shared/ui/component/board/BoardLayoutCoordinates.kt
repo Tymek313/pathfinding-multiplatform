@@ -23,23 +23,23 @@ internal class BoardLayoutCoordinates {
         boardSizePx = sizes.sum()
     }
 
-    fun getNodeIndex(pointerOffset: Offset): Int? {
-        return if (
-            pointerOffset.x > 0 &&
-            pointerOffset.y > 0 &&
-            pointerOffset.x < boardSizePx &&
-            pointerOffset.y < boardSizePx
-        ) {
-            getNodeIndex(pointerOffset.y.toInt()) * boardSizeInNodes + getNodeIndex(pointerOffset.x.toInt())
-        } else {
-            null
-        }
+    fun getNodeIndex(pointerOffset: Offset): Int? = if (
+        pointerOffset.x > 0 &&
+        pointerOffset.y > 0 &&
+        pointerOffset.x < boardSizePx &&
+        pointerOffset.y < boardSizePx
+    ) {
+        getNodeIndex(pointerOffset.y.toInt()) * boardSizeInNodes + getNodeIndex(pointerOffset.x.toInt())
+    } else {
+        null
     }
 
     private fun getNodeIndex(nodeOffset: Int): Int {
         nodeIndexUpperOffsetsPx!!.forEachIndexed { index, offset ->
             if (nodeOffset <= offset) return index
         }
-        error("Could not find breakpoint for pointer coordinates. Offset: $nodeOffset, breakpoints: $nodeIndexUpperOffsetsPx")
+        error(
+            "Could not find breakpoint for pointer coordinates. Offset: $nodeOffset, breakpoints: $nodeIndexUpperOffsetsPx"
+        )
     }
 }

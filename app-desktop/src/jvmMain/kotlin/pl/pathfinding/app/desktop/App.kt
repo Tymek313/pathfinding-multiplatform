@@ -10,6 +10,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.singleWindowApplication
+import java.awt.Dimension
+import java.io.PrintWriter
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 import pathfinding.shared.ui.generated.resources.Res
@@ -17,8 +19,6 @@ import pathfinding.shared.ui.generated.resources.graph_pathfinding
 import pl.pathfinding.shared.ui.screen.BoardScreen
 import pl.pathfinding.shared.ui.theme.PathfindingBackground
 import pl.pathfinding.shared.ui.theme.PathfindingTheme
-import java.awt.Dimension
-import java.io.PrintWriter
 
 fun main() {
     registerGlobalExceptionHandler()

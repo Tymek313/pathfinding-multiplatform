@@ -22,10 +22,8 @@ import pl.pathfinding.shared.domain.pathfinder.PathfinderFactory
 import pl.pathfinding.shared.domain.pathfinder.PathfinderType
 
 @Composable
-internal fun rememberBoardState(): BoardState {
-    return rememberSaveable(saver = BoardState.Saver) {
-        BoardState()
-    }
+internal fun rememberBoardState(): BoardState = rememberSaveable(saver = BoardState.Saver) {
+    BoardState()
 }
 
 internal class BoardState(
@@ -95,13 +93,11 @@ internal class BoardState(
         }
     }
 
-    fun onDrag(id: NodeId): Boolean {
-        return if (searchState == SearchState.IDLE) {
-            onNodeDrag(id)
-            true
-        } else {
-            false
-        }
+    fun onDrag(id: NodeId): Boolean = if (searchState == SearchState.IDLE) {
+        onNodeDrag(id)
+        true
+    } else {
+        false
     }
 
     private fun onNodeDrag(id: NodeId) {
@@ -152,15 +148,13 @@ internal class BoardState(
         }
     }
 
-    private fun pendingAnimationCancellationApplied(ticker: ReceiveChannel<Unit>): Boolean {
-        return if (shouldCancelSearch) {
-            shouldCancelSearch = false
-            searchState = SearchState.IDLE
-            ticker.cancel()
-            true
-        } else {
-            false
-        }
+    private fun pendingAnimationCancellationApplied(ticker: ReceiveChannel<Unit>): Boolean = if (shouldCancelSearch) {
+        shouldCancelSearch = false
+        searchState = SearchState.IDLE
+        ticker.cancel()
+        true
+    } else {
+        false
     }
 
     private fun advanceAnimation(ticker: ReceiveChannel<Unit>, pathfinder: Pathfinder) {

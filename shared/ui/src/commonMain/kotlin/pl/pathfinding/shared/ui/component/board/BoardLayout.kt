@@ -59,7 +59,6 @@ internal fun BoardLayout(
     }
 }
 
-
 private typealias GetIndexInAxisOperation = (Int, Int) -> Int
 
 private val GetIndexInXAxisOperation: GetIndexInAxisOperation = Int::rem

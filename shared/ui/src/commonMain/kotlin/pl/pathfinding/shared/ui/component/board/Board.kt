@@ -73,29 +73,27 @@ private fun NodeState.toStateDescriptionRes() = when (this) {
     NodeState.QUEUED -> Res.string.node_state_queued
 }
 
-private fun Modifier.boardPointerInput(
-    state: BoardState,
-    boardCoordinates: BoardLayoutCoordinates,
-) = pointerInput(Unit) {
-    detectDragGestures(
-        onDragEnd = state::onPointerInputEnd,
-        onDrag = { change, _ ->
-            val nodeId = boardCoordinates.getNodeIndex(change.position)?.let(state.nodeIds::get)
-            if (nodeId != null && state.onDrag(nodeId)) {
-                change.consume()
+private fun Modifier.boardPointerInput(state: BoardState, boardCoordinates: BoardLayoutCoordinates) =
+    pointerInput(Unit) {
+        detectDragGestures(
+            onDragEnd = state::onPointerInputEnd,
+            onDrag = { change, _ ->
+                val nodeId = boardCoordinates.getNodeIndex(change.position)?.let(state.nodeIds::get)
+                if (nodeId != null && state.onDrag(nodeId)) {
+                    change.consume()
+                }
             }
-        }
-    )
-}.pointerInput(Unit) {
-    detectTapGestures(
-        onTap = { offset ->
-            boardCoordinates.getNodeIndex(offset)?.let(state.nodeIds::get)?.let(state::onNodeClick)
-        },
-        onPress = { offset ->
-            boardCoordinates.getNodeIndex(offset)?.let(state.nodeIds::get)?.let(state::onDragStart)
-        }
-    )
-}
+        )
+    }.pointerInput(Unit) {
+        detectTapGestures(
+            onTap = { offset ->
+                boardCoordinates.getNodeIndex(offset)?.let(state.nodeIds::get)?.let(state::onNodeClick)
+            },
+            onPress = { offset ->
+                boardCoordinates.getNodeIndex(offset)?.let(state.nodeIds::get)?.let(state::onDragStart)
+            }
+        )
+    }
 
 @Preview
 @Composable

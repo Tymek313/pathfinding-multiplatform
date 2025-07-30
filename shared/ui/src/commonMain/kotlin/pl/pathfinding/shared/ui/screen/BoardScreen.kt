@@ -78,7 +78,6 @@ private fun WideBoardScreen(boardState: BoardState, modifier: Modifier = Modifie
         }
         Card(modifier = Modifier.width(IntrinsicSize.Min).padding(16.dp)) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-
                 ControlButton(
                     modifier = controlButtonModifier,
                     text = stringResource(Res.string.start_search),
@@ -195,7 +194,8 @@ private fun PathfinderTypeDropdown(
         )
         ExposedDropdownMenu(
             expanded = isPathfinderDropdownExpanded,
-            onDismissRequest = { isPathfinderDropdownExpanded = false }) {
+            onDismissRequest = { isPathfinderDropdownExpanded = false }
+        ) {
             PathfinderType.entries.forEach { pathfinderType ->
                 DropdownMenuItem(
                     text = { Text(text = stringResource(pathfinderType.pathfinderNameRes)) },
