@@ -209,8 +209,6 @@ private fun PathfinderTypeDropdown(
     }
 }
 
-internal const val TEST_TAG_BOARD = "board"
-
 private val PathfinderType.pathfinderNameRes
     get() = when (this) {
         PathfinderType.BREADTH_FIRST -> Res.string.breadth_first

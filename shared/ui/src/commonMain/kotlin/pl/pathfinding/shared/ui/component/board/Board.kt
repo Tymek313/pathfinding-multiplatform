@@ -27,7 +27,8 @@ import pathfinding.shared.ui.generated.resources.node_state_start
 import pathfinding.shared.ui.generated.resources.node_state_traversable
 import pathfinding.shared.ui.generated.resources.node_state_visited
 import pl.pathfinding.shared.domain.node.NodeState
-import pl.pathfinding.shared.ui.screen.TEST_TAG_BOARD
+
+internal const val TEST_TAG_BOARD = "board"
 
 @Composable
 internal fun Board(state: BoardState, modifier: Modifier = Modifier) {
