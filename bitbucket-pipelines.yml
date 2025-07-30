@@ -5,32 +5,41 @@ pipelines:
     main:
       - parallel:
           - step:
+              name: Unit tests
+              caches:
+                - gradle
+              artifacts:
+                - '*/build/reports/tests/**'
+              script:
+                - ./gradlew jvmTest --continue
+          - step:
+              name: Ktlint check
+              caches:
+                - gradle
+              artifacts:
+                - '*/build/reports/ktlint/**'
+              script:
+                - ./gradlew ktlintCommonMainSourceSetCheck --continue
+                - ./gradlew ktlintAndroidMainSourceSetCheck --continue
+                - ./gradlew ktlintJvmMainSourceSetCheck --continue
+          - step:
               name: Android lint
               caches:
                 - gradle
               script:
                 - ./gradlew lint --continue
               artifacts:
-                - app/build/reports/**
+                - '*/build/reports/lint-results-debug.*'
+      - parallel:
           - step:
-              name: Unit tests
+              name: Build Android
               caches:
                 - gradle
-              artifacts:
-                - 'build/reports/jacoco/jacocoTestReport/html/**'
               script:
-                - ./gradlew jacocoTestReport --continue
+                - ./gradlew app-android:assembleDebug
           - step:
-              name: Ktlint check
+              name: Build desktop
               caches:
                 - gradle
-              artifacts:
-                - '*/build/reports/ktlint/ktlintMainSourceSetCheck/**'
               script:
-                - ./gradlew ktlintMainSourceSetCheck --continue
-      - step:
-          name: Build APK
-          caches:
-            - gradle
-          script:
-            - ./gradlew app:assembleDebug
+                - ./gradlew app-desktop:createDistributable
