@@ -1,25 +1,25 @@
 package pl.pathfinding.shared.domain.node
 
-enum class NodeState(val isDraggable: Boolean, val isQueueable: Boolean) {
-    START(isDraggable = true, isQueueable = false) {
+enum class NodeState(val isQueueable: Boolean) {
+    START(isQueueable = false) {
         override val toggleState: NodeState? = null
     },
-    DESTINATION(isDraggable = true, isQueueable = false) {
+    DESTINATION(isQueueable = false) {
         override val toggleState: NodeState? = null
     },
-    TRAVERSABLE(isDraggable = false, isQueueable = true) {
+    TRAVERSABLE(isQueueable = true) {
         override val toggleState get() = OBSTACLE
     },
-    OBSTACLE(isDraggable = false, isQueueable = false) {
+    OBSTACLE(isQueueable = false) {
         override val toggleState get() = TRAVERSABLE
     },
-    PATH(isDraggable = false, isQueueable = false) {
+    PATH(isQueueable = false) {
         override val toggleState: NodeState? = null
     },
-    VISITED(isDraggable = false, isQueueable = false) {
+    VISITED(isQueueable = false) {
         override val toggleState: NodeState? = null
     },
-    QUEUED(isDraggable = false, isQueueable = false) {
+    QUEUED(isQueueable = false) {
         override val toggleState: NodeState? = null
     };
 

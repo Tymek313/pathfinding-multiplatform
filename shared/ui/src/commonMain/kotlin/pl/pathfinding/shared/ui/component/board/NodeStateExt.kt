@@ -13,3 +13,14 @@ internal val NodeState.color: Color
         NodeState.VISITED -> Color.Gray
         NodeState.QUEUED -> Color.Blue
     }
+
+internal val NodeState.isDraggable: Boolean
+    get() = when (this) {
+        NodeState.START -> true
+        NodeState.DESTINATION -> true
+        NodeState.TRAVERSABLE -> false
+        NodeState.OBSTACLE -> false
+        NodeState.PATH -> false
+        NodeState.VISITED -> false
+        NodeState.QUEUED -> false
+    }
