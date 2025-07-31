@@ -8,10 +8,14 @@ import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.channels.ChannelResult
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.ticker
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import pl.pathfinding.shared.domain.graph.DefaultStateGraph
 import pl.pathfinding.shared.domain.graph.StateGraph
 import pl.pathfinding.shared.domain.node.NodeId
@@ -52,7 +56,7 @@ internal class BoardState(
     private var searchState by mutableStateOf(SearchState.IDLE)
     val isBoardIdle by derivedStateOf { searchState == SearchState.IDLE }
     val isBoardSearchFinished by derivedStateOf { searchState == SearchState.FINISHED }
-    private var shouldCancelSearch = false
+    private var animationJob: Job? = null
 
     init {
         graph = initialGraph // trigger setter
@@ -65,8 +69,12 @@ internal class BoardState(
         }
 
         if (searchState == SearchState.IN_PROGRESS) {
-            shouldCancelSearch = true
-            graph!!.restoreFromSnapshot(graphSnapshot!!)
+            animationJob!!.cancel()
+            requireGraph().restoreFromSnapshot(graphSnapshot!!)
+            searchState = SearchState.IDLE
+        } else if (searchState == SearchState.FINISHED) {
+            requireGraph().restoreFromSnapshot(graphSnapshot!!)
+            searchState = SearchState.IDLE
         }
 
         boardSize = boardSizeInNodes
@@ -139,22 +147,14 @@ internal class BoardState(
         graphSnapshot = requireGraph().createSnapshot()
         searchState = SearchState.IN_PROGRESS
         val pathfinder = pathfinderFactory.create(pathfinderType, requireGraph())
-        ticker(ANIMATION_DELAY_MILLIS).also { ticker ->
-            ticker.consumeEach {
-                if (!pendingAnimationCancellationApplied(ticker)) {
-                    advanceAnimation(ticker, pathfinder)
+        coroutineScope {
+            // Another tick is still received after calling ticker's `cancel()`. Use coroutine instead
+            animationJob = launch {
+                ticker(ANIMATION_DELAY_MILLIS, context = coroutineContext).also { ticker ->
+                    ticker.consumeEach { advanceAnimation(ticker, pathfinder) }
                 }
             }
         }
-    }
-
-    private fun pendingAnimationCancellationApplied(ticker: ReceiveChannel<Unit>): Boolean = if (shouldCancelSearch) {
-        shouldCancelSearch = false
-        searchState = SearchState.IDLE
-        ticker.cancel()
-        true
-    } else {
-        false
     }
 
     private fun advanceAnimation(ticker: ReceiveChannel<Unit>, pathfinder: Pathfinder) {
