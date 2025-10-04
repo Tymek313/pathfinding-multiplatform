@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        required: true
+        type: string
+
+jobs:
+  build-with-verification:
+    uses: ./.github/workflows/build-with-verification.yml
+
+  create-draft-release:
+    runs-on: ubuntu-latest
+    needs: build-with-verification
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v5
+        with:
+          path: binaries
+
+      - run: |
+          gh release create --draft ${{ github.event.inputs.tag }}
+          cd binaries
+          mv pathfinding-android/app-android-release.apk pathfinding-android.apk
+          zip -r pathfinding-windows.zip pathfinding-windows
+          zip -r pathfinding-linux.zip pathfinding-linux
+          gh release upload ${{ github.event.inputs.tag }} pathfinding-android.apk pathfinding-windows.zip pathfinding-linux.zip

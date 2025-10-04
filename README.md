@@ -1,5 +1,7 @@
 # Kotlin Multiplatform Pathfinding App
 
+[![Verify and build](https://github.com/Tymek313/pathfinding-multiplatform/actions/workflows/build-with-verification.yml/badge.svg?branch=master)](https://github.com/Tymek313/pathfinding-multiplatform/actions/workflows/build-with-verification.yml)
+
 ## 🎯 Features
 
 - __Breadth first__ and __depth first__ pathfinding algorithms implementations
@@ -7,9 +9,9 @@
   such exists)
 - Placing/removing obstacles with clicks or by dragging
 - Moving start and destination nodes across the board
-- Clearing board of the obstacles
+- Clearing the board off of the obstacles
 - Restore board state on activity recreation (Android)
-- Dynamic board size calulation based on available screen space
+- Dynamic board size calculation based on available screen space
 - Multilanguage support (English/Polish)
 
 ## 🔬 Technical details
@@ -29,5 +31,5 @@
 
 ## 👀 Previews
 
-![android](https://bitbucket.org/tymek313/pathfinding-multiplatform/raw/master/preview/android.gif)
-![desktop](https://bitbucket.org/tymek313/pathfinding-multiplatform/raw/master/preview/desktop.gif)
+![android](https://github.com/Tymek313/pathfinding-multiplatform/blob/master/preview/android.gif)
+![desktop](https://github.com/Tymek313/pathfinding-multiplatform/blob/master/preview/desktop.gif)

@@ -25,7 +25,7 @@ kotlin {
 compose.desktop {
     application {
         mainClass = "pl.pathfinding.app.desktop.AppKt"
-
+        //jvmArgs += "-Duser.language=en"  // Simulate system language
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "pathfinding"

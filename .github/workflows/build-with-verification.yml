@@ -1,0 +1,99 @@
+name: Verify and build
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup
+
+      - name: Common unit tests
+        id: unit-tests
+        run: ./gradlew jvmTest
+
+      - name: Android lint
+        id: android-lint
+        run: ./gradlew lint
+
+      - name: Common Ktlint check
+        id: ktlint-common
+        run: |
+          ./gradlew ktlintCommonMainSourceSetCheck
+
+      - name: Android Ktlint check
+        id: ktlint-android
+        run: |
+          ./gradlew ktlintAndroidMainSourceSetCheck
+
+      - name: JVM Ktlint check
+        id: ktlint-jvm
+        run: |
+          ./gradlew ktlintJvmMainSourceSetCheck
+
+      - name: Upload failed unit test check report artifact
+        if: ${{ failure() && steps.unit-tests.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Unit test report
+          path: '*/build/reports/tests/jvmTest/**'
+          if-no-files-found: error
+
+      - name: Upload failed Android lint check report artifact
+        if: ${{ failure() && steps.android-lint.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android lint report
+          path: '*/build/reports/lint-results-*.*'
+          if-no-files-found: error
+
+      - name: Upload failed Ktlint check report artifact
+        if: ${{ failure() && (steps.ktlint-common.outcome == 'failure' || steps.ktlint-android.outcome == 'failure' || steps.ktlint-jvm.outcome == 'failure') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ktlint report
+          path: '*/build/reports/ktlint/ktlintMainSourceSetCheck/**'
+          if-no-files-found: error
+
+  build:
+    needs: verify
+    strategy:
+      matrix:
+        platform:
+          - name: pathfinding-android
+            os: ubuntu-latest
+            module: app-android
+            task: assembleRelease
+            executable-path: app-android/build/outputs/apk/release/app-android-release.apk
+
+          - name: pathfinding-windows
+            os: windows-latest
+            module: app-desktop
+            task: createReleaseDistributable
+            executable-path: app-desktop/build/compose/binaries/main-release/app/pathfinding/**
+
+          - name: pathfinding-linux
+            os: ubuntu-latest
+            module: app-desktop
+            task: createReleaseDistributable
+            executable-path: app-desktop/build/compose/binaries/main-release/app/pathfinding/**
+
+    runs-on: ${{ matrix.platform.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup
+
+      - name: Build
+        run: ./gradlew ${{ matrix.platform.module }}:${{ matrix.platform.task }}
+
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform.name }}
+          path: ${{ matrix.platform.executable-path }}
+          if-no-files-found: error
